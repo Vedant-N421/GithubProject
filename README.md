@@ -2,7 +2,7 @@
  The GitHub API is documented here: https://docs.github.com/en/rest
  We will be connecting to this API to create a vervion of 'github'
  You should clone this repo and in terminal type sbt run, in your browser on localhost:9000 you should see a page with the title "Welcome to your version   of GitHub"
-##Task 1.
+## Task 1.
  The first page you should create is {url}/github/users/{username}
  When somebody accesses your app at the above url, display the following information for the provided username: username, date account created, location,   number of followers, number following.
  Github exposes an api that you can create a connector for to gather this information. The GitHub API is documented here: https://docs.github.com/en/rest   the connector for this particular task will use this page:
