@@ -33,7 +33,8 @@
  On this page display the names of files & folders (as determined by an API call) for the selected usernames’ repository.
  
  ## Task 7.
-  Stretch excercise Make a new route GET /github/users/:username/repos/:repoName/*path
+  Stretch excercise 
+  Make a new route GET /github/users/:username/repos/:repoName/*path
   Path will be path to file I.E app/controllers/HelloWorldController.scala, you can base64 encode path for ease
   If the path given resolves to a file, display the plaintext of the file on the page.
   If the path given is a folder, display the files & foldernames (In the same way it's displayed in the first part of Task 4)
@@ -42,4 +43,5 @@
  Link up the pages. I.E the first step of task 5 doesn't only list the files/folders but they are hyperlinks that will direct to the correct page in the  stretch exercise.
  For example /github/users/jxr227/repos/ROScratch  Will show various files and folders including the folder "exercises". If you click "exercises" you  will be directed to:
  /github/users/jxr227/repos/ROScratch/exercises
+ 
  Do the same on the /*path pages, so that you can, from the top level of a repository, browse all folders and files
