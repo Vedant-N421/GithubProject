@@ -8,8 +8,9 @@
  
 ## Task 1.
  Your mongdb should contain users which will have the following information: username, date account created, location, number of followers, number following.
-    Look at the return of a user from the github API to help you make your model of a user. Try inputting your github username into the url to see: https://api.github.com/users/{yourUusername}
- Set up your mongo database and a model of the user it will accept.
+    Look at the return of a user from the github API to help you make your model of a user. Try inputting your github username into the url to see: https://api.github.com/users/{yourUsername}
+ 
+    Set up your mongo database and a model of the user it will accept.
  
  ## Task 2.
  Create a route that will return a user from the github API with the route:
