@@ -7,7 +7,7 @@
   For package structure use standard: view (html templates), controller (API endpoint entry), service (Orchestration, should be light weight seeing as    we're only calling one endpoint), connector (To speak to api.github), model (Domain model data representation).
  Using the GitHub API it’s a lot easier if upfront you start to use your own git credentials for authorisation (to avoid rate limits) -    https://developer.github.com/v3/auth/#basic-authentication (no need to worry about authorisation at the moment you can come back to this once you get to task 9 as authorisation is needed when you start creating and deleting in repositories on the github api)
 
- When writing your code only have working code on your main branch and for each new bit of code write this on a branch. When this new feature is done and all the code is working on your branch create a pull request to merge your branch into main.
+ When writing your code only have working code on your main branch and for each new feature create a branch to create this. When this new feature is done and all the code is working create a pull request to merge your branch into main.
  
 ## Task 1.
  Your mongodb should contain users which will have the following information: username, date account created, location, number of followers, number following.
