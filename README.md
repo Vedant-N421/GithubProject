@@ -73,5 +73,5 @@ When adding users to the database make sure there cannot be duplicate usernames 
  Now that you have accomplished step 10 instead of using curl requests in terminal try creating a form, so you can complete these routes from your browser.
 
 ## Task 12.
- Add some css styling the layout of your pages. 
+ Add some css styling to the layout of your pages. 
 
