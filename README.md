@@ -4,7 +4,32 @@
  The GitHub API is documented here: https://docs.github.com/en/rest
 
  We will be connecting to this API to create a version of 'GitHub'.
- You should clone this repo (ssh link: git@github.com:robynHM/githubTutorial.git) and in terminal type sbt run, in your browser on localhost:9000 you should see a page with the title "Welcome to your version of GitHub".
+ You should clone this repo (ssh link: git@github.com:robynHM/githubTutorial.git).
+ We want to track changes to the project using git. Since we cloned this repo we are going to change the remote origin.
+
+ * Go to your GitHub account → Your repositories → Create new repository 
+   * Give it the same name as your local project 
+   * Ensure it is public 
+   * Ensure 'Initialise with README' is unticked 
+ * Go to the command line/terminal:
+   * We need to tell git where the remote GitHub repository is, so that we can push up changes. Run the following, substituting with your GitHub username and newly created project name 
+   * `git remote rename origin upstream` (The old origin is now renamed to upstream)
+   * `git remote add origin git@github.com:<username>/<repo-name>.git` (A new origin is added, your github!)
+   * e.g. `git remote add origin git@github.com:vinniebrice/play-template.git`
+ 
+ * Run `git remote -v` to check the remote is correct
+
+ * Run `git status`, and you can now see there are various files git has picked up but is not yet tracking any changes and only recognises a whole bunch of new folders and files.
+
+ * Run `git add .` to add all files in red to a 'staging area' in preparation for a final commit
+
+ * To make a commit, run `git commit -m "example message"` (Think of an appropriate message for the changes you've made)
+
+ * Push your new commit up to main `git push origin main` (Note: there are two places we 'can' push to, the old location, upstream, and your new one, origin.)
+
+ * Go to your new project on GitHub to check everything pushed up okay.
+ 
+ * In terminal type `sbt run`, in your browser on localhost:9000 you should see a page with the title "Welcome to your version of GitHub".
  
   For package structure use standard: 
 
