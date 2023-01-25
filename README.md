@@ -5,7 +5,8 @@
  You should clone this repo (ssh link: git@github.com:robynHM/githubTutorial.git) and in terminal type sbt run, in your browser on localhost:9000 you should see a page with the title "Welcome to your version of GitHub".
  
   For package structure use standard: 
-    * view 
+
+    * view
         * This contains the html templates which are the pages that are viewable in the browser.
     * controller 
         *  API endpoint entry
