@@ -31,7 +31,7 @@
 
  When writing your code only have working code on your main branch and for each new task create a branch to create this. 
 
- This is great practice as if we push directly to main we could potentially be breaking the code or causing merge conflicts. 
+ This is great practice as if we push directly to main we could potentially be breaking the code or cause merge conflicts. 
  We can make commits in an isolated branch that will not affect the code in main which should only ever be working code.
 
  When the task is completed, you have written the corresponding tests, and they are passing create a pull request to merge your branch into main.
