@@ -12,16 +12,17 @@
     * API endpoint entry
     * Responsible for displaying views files
     * Interacts with the service layer
-Then make folders:
-    * service 
-        * Orchestration, should be lightweight seeing as we're only calling one endpoint
-        * Service should contain all the logic and checks we want to happen. e.g. is the data that is submitted to be added into database the correct format
-    * connector 
-        * To send requests to external services
-    * model 
-        * Domain model data representation
-    * repository
-        * This contains the methods to interact with your database
+
+  Then make folders:
+* service 
+  * Orchestration, should be lightweight seeing as we're only calling one endpoint
+  * Service should contain all the logic and checks we want to happen. e.g. is the data that is submitted to be added into database the correct format
+* connector 
+  * To send requests to external services
+* model 
+  * Domain model data representation
+* repository
+    * This contains the methods to interact with your database
 
 
  Using the GitHub API it’s a lot easier if upfront you start to use your own git credentials for authorisation (to avoid rate limits) - https://developer.github.com/v3/auth/#basic-authentication (no need to worry about authorisation at the moment you can come back to this once you get to task 9 as authorisation is needed when you start creating and deleting in repositories on the github api)
