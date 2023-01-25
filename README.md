@@ -27,7 +27,7 @@
     * This contains the methods to interact with your database
 
 
- Using the GitHub API you come across rate limits if this occurs it can be easier if upfront you start to use your own git credentials for authorisation - https://developer.github.com/v3/auth/#basic-authentication (you may not need to worry about authorisation yet and can come back to this once you get to task 9 as authorisation is needed when you start manipulating repositories on the GitHub API)
+ Using the GitHub API you come across rate limits, if this occurs it can be easier if upfront you use your own git credentials for authorisation - https://developer.github.com/v3/auth/#basic-authentication (you may not need to worry about authorisation yet and can come back to this once you get to task 9 as authorisation is needed when you start manipulating repositories on the GitHub API.)
 
  When writing your code only have working code on your main branch and for each new task create a branch to create this. 
 
@@ -54,7 +54,7 @@
  Use this connector to do this:
  https://api.github.com/users/{username}
 
-## Task 3.
+ ## Task 3.
  Make routes for all the CRUD commands (Create Read Update Delete)
  
  ## Task 4.
