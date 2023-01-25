@@ -1,5 +1,5 @@
 # GitHub Exercise
- - Please NOTE: These instructions maybe updated please check the README on GitHub for the most up-to-date instructions.
+ - Please NOTE: These instructions maybe updated, please check the README on GitHub for the most up-to-date instructions.
 
  The GitHub API is documented here: https://docs.github.com/en/rest
 
