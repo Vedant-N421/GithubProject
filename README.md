@@ -6,13 +6,13 @@
  
   For package structure use standard: 
 
-    * view
-        * This contains the html templates which are the pages that are viewable in the browser.
-    * controller 
-        *  API endpoint entry
-        *  Responsible for displaying views files
-        *  Interacts with the service layer
-    Then make folders:
+* views
+  * This contains the html templates which are the pages that are viewable in the browser.
+* controller 
+    * API endpoint entry
+    * Responsible for displaying views files
+    * Interacts with the service layer
+Then make folders:
     * service 
         * Orchestration, should be lightweight seeing as we're only calling one endpoint
         * Service should contain all the logic and checks we want to happen. e.g. is the data that is submitted to be added into database the correct format
