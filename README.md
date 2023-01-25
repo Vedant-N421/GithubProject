@@ -1,7 +1,9 @@
 # GitHub Exercise
+ -This instructions maybe updated please check the README on GitHub for the most up-to-date instructions.
+
  The GitHub API is documented here: https://docs.github.com/en/rest
 
- We will be connecting to this API to create a version of 'github'.
+ We will be connecting to this API to create a version of 'GitHub'.
  You should clone this repo (ssh link: git@github.com:robynHM/githubTutorial.git) and in terminal type sbt run, in your browser on localhost:9000 you should see a page with the title "Welcome to your version of GitHub".
  
   For package structure use standard: 
@@ -25,7 +27,7 @@
     * This contains the methods to interact with your database
 
 
- Using the GitHub API it’s a lot easier if upfront you start to use your own git credentials for authorisation (to avoid rate limits) - https://developer.github.com/v3/auth/#basic-authentication (no need to worry about authorisation at the moment you can come back to this once you get to task 9 as authorisation is needed when you start creating and deleting in repositories on the github api)
+ Using the GitHub API you come across rate limits if this occurs it can be easier if upfront you start to use your own git credentials for authorisation - https://developer.github.com/v3/auth/#basic-authentication (you may not need to worry about authorisation yet and can come back to this once you get to task 9 as authorisation is needed when you start manipulating repositories on the GitHub API)
 
  When writing your code only have working code on your main branch and for each new task create a branch to create this. 
 
