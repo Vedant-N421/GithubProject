@@ -1,0 +1,15 @@
+@import models._
+@(userModel: UserModel)
+
+@main("Display User"){
+    <h1>GitHub API Project Testing</h1>
+  <b>
+      User: @userModel.login <br><br>
+      ID: @userModel.id <br><br>
+      URL: @userModel.url <br><br>
+      Node ID: @userModel.node_id <br><br>
+      Created: @userModel.created_at <br><br>
+      Follower count: @userModel.followers <br><br>
+      Following count: @userModel.following <br><br>
+  </b>
+}

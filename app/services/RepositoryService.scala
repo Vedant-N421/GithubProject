@@ -1,3 +1,5 @@
 package services
 
-class RepositoryService {}
+class RepositoryService {
+
+}

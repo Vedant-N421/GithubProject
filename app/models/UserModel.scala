@@ -1,14 +1,15 @@
 package models
 
-import akka.http.scaladsl.model.headers.Date
 import play.api.libs.json.{Json, OFormat}
 
 case class UserModel(
-    username: String,
-    dateCreated: Date,
-    location: String,
-    followerCount: Int,
-    followingCount: Int
+    login: String,
+    id: Int,
+    url: String,
+    node_id: String,
+    created_at: String,
+    followers: Int,
+    following: Int
 )
 
 object UserModel {
