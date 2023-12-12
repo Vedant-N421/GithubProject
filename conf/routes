@@ -11,7 +11,8 @@ GET     /assets/*file               controllers.Assets.versioned(path="/public",
 
 GET     /users/:userName            controllers.ApplicationController.displayUser(userName: String)
 
+GET     /api                        controllers.ApplicationController.index
 POST    /create                     controllers.ApplicationController.create()
-GET     /read/:id                   controllers.ApplicationController.read(id: String)
-PUT     /update/:id                 controllers.ApplicationController.update(id: String)
-DELETE  /delete/:id                 controllers.ApplicationController.delete(id: String)
+GET     /read/:login                controllers.ApplicationController.read(login: String)
+PUT     /update/:login              controllers.ApplicationController.update(login: String)
+DELETE  /delete/:login              controllers.ApplicationController.delete(login: String)

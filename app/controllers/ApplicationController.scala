@@ -1,14 +1,13 @@
 package controllers
 
 import connectors.GitHubConnector
-import models.{DataModel, UserModel}
+import models._
 import play.api.libs.json.{JsValue, Json}
-import play.api.mvc.Results._
 import play.api.mvc.{Action, AnyContent, BaseController, ControllerComponents}
 import services.RepositoryService
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class ApplicationController @Inject()(
     val controllerComponents: ControllerComponents,
@@ -20,36 +19,60 @@ class ApplicationController @Inject()(
 
   def displayUser(login: String): Action[AnyContent] = Action.async { implicit request =>
     gitHubConnector.get[UserModel](login).map {
-      case Right(user: UserModel) => Ok(Json.toJson(user))
+      case Right(user: UserModel) => Ok(views.html.displayuser(user))
       case Left(err: String) => BadRequest(err)
     }
   }
 
-  def create(): Action[JsValue] = Action.async(parse.json) = { implicit request =>
+  def index(): Action[AnyContent] = Action.async { implicit request =>
+    repositoryService.index().flatMap {
+      case Right(item: Seq[UserModel]) => Future(Ok(Json.toJson(item)))
+      case Left(error: String) => Future(BadRequest(Json.toJson(error)))
+    }
+  }
+
+  def create(): Action[JsValue] = Action.async(parse.json) { implicit request =>
     repositoryService.create(request).map {
-      case Right(book) => Created(Json.toJson(book))
+      case Right(user: UserModel) => Created(Json.toJson(user))
       case Left(error) => BadRequest(Json.toJson(error))
     }
   }
 
-  def read(id: String): Action[AnyContent] = Action.async { implicit request =>
-    repositoryService.read(id).map {
-      case Right(book: UserModel) => Ok(Json.toJson(book))
+  def read(login: String): Action[AnyContent] = Action.async { implicit request =>
+    repositoryService.read(login).map {
+      case Right(user: UserModel) => Ok(Json.toJson(user))
       case Left(error) => BadRequest(Json.toJson(error))
     }
   }
 
-  def update(id: String): Action[JsValue] = Action.async(parse.json) { implicit request =>
-    repositoryService.update(id, request).map {
-      case Right(book) => Accepted(Json.toJson(book))
+  def update(login: String): Action[JsValue] = Action.async(parse.json) { implicit request =>
+    repositoryService.update(login, request).map {
+      case Right(user: UserModel) => Accepted(Json.toJson(user))
       case Left(error) => BadRequest(Json.toJson(error))
     }
   }
 
-  def delete(id: String): Action[AnyContent] = Action.async { implicit request =>
-    repositoryService.delete(id: String).map {
+  def delete(login: String): Action[AnyContent] = Action.async { implicit request =>
+    repositoryService.delete(login: String).map {
       case Right(message) => Accepted(Json.toJson(message))
       case Left(error) => BadRequest(Json.toJson(error))
     }
   }
+
+  def readAny[T](field: String, value: T): Action[AnyContent] = Action.async { implicit request =>
+    repositoryService.readAny(field, value).map {
+      case Right(user: UserModel) =>
+        Ok(Json.toJson(user))
+      case Left(error) =>
+        BadRequest(Json.toJson(error))
+    }
+  }
+
+  def partialUpdate[T](login: String, field: String, value: T): Action[JsValue] =
+    Action.async(parse.json) { implicit request =>
+      repositoryService.partialUpdate(login, field, value).map {
+        case Right(user) => (Accepted(Json.toJson(user)))
+        case Left(error) => (BadRequest(Json.toJson(error)))
+      }
+    }
 }
