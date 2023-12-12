@@ -16,7 +16,7 @@ import play.api.mvc.{AnyContentAsEmpty, MessagesControllerComponents}
 import play.api.test.CSRFTokenHelper.CSRFFRequestHeader
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{DELETE, GET, POST, PUT}
-import repositories.DataRepository
+import repositories.UserRepository
 import services.RepositoryService
 
 import scala.concurrent.ExecutionContext
@@ -36,7 +36,7 @@ trait BaseSpecWithApplication
   implicit val ws: WSClient = app.injector.instanceOf[WSClient]
 
   lazy val component: MessagesControllerComponents = injector.instanceOf[MessagesControllerComponents]
-  lazy val repository: DataRepository = injector.instanceOf[DataRepository]
+  lazy val repository: UserRepository = injector.instanceOf[UserRepository]
   lazy val repoService: RepositoryService = injector.instanceOf[RepositoryService]
   lazy val connector: GitHubConnector = injector.instanceOf[GitHubConnector]
 

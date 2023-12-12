@@ -9,4 +9,10 @@ GET     /                           controllers.HomeController.index()
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
 
-GET     /users/:userName           controllers.ApplicationController.displayUser(userName: String)
+GET     /users/:userName            controllers.ApplicationController.displayUser(userName: String)
+
+GET     /api                        controllers.ApplicationController.index
+POST    /create                     controllers.ApplicationController.create()
+GET     /read/:login                controllers.ApplicationController.read(login: String)
+PUT     /update/:login              controllers.ApplicationController.update(login: String)
+DELETE  /delete/:login              controllers.ApplicationController.delete(login: String)
