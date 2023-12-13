@@ -4,14 +4,17 @@ import com.mongodb.client.result.DeleteResult
 import models._
 import play.api.libs.json.{JsError, JsSuccess, JsValue}
 import play.api.mvc.Request
-import repositories.UserRepository
+import repositories.UserRepoTrait
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class RepositoryService @Inject()(val userRepository: UserRepository)(implicit executionContext: ExecutionContext) {
+class RepositoryService @Inject()(
+    val userRepoTrait: UserRepoTrait
+)(implicit executionContext: ExecutionContext) {
+
   def index(): Future[Either[String, Seq[UserModel]]] = {
-    userRepository.index().map {
+    userRepoTrait.index().map {
       case Right(item: Seq[UserModel]) => Right(item)
       case Left(error: String) => Left(error)
     }
@@ -20,7 +23,7 @@ class RepositoryService @Inject()(val userRepository: UserRepository)(implicit e
   def create(request: Request[JsValue]): Future[Either[String, UserModel]] = {
     request.body.validate[UserModel] match {
       case JsSuccess(user, _) =>
-        userRepository.create(user).map {
+        userRepoTrait.create(user).map {
           case None => Left("ERROR: Duplicate found, item not created.")
           case _ => Right(user)
         }
@@ -31,7 +34,7 @@ class RepositoryService @Inject()(val userRepository: UserRepository)(implicit e
   def update(id: String, request: Request[JsValue]): Future[Either[String, UserModel]] = {
     request.body.validate[UserModel] match {
       case JsSuccess(user: UserModel, _) =>
-        userRepository.update(id, user)
+        userRepoTrait.update(id, user)
         Future(Right(user))
       case JsError(_) => Future(Left("ERROR: User not updated."))
     }
@@ -39,7 +42,7 @@ class RepositoryService @Inject()(val userRepository: UserRepository)(implicit e
 
   def read(id: String): Future[Either[String, UserModel]] = {
     for {
-      book <- userRepository.read(id)
+      book <- userRepoTrait.read(id)
       res = book match {
         case Some(item: UserModel) => Right(item)
         case _ | None => Left("ERROR: Unable to read user's profile.")
@@ -48,7 +51,7 @@ class RepositoryService @Inject()(val userRepository: UserRepository)(implicit e
   }
 
   def delete(id: String): Future[Either[String, String]] = {
-    userRepository.delete(id: String).map {
+    userRepoTrait.delete(id: String).map {
       case Right(_: DeleteResult) => Right("INFO: User was deleted successfully.")
       case Left(error) => Left(error)
     }
@@ -56,7 +59,7 @@ class RepositoryService @Inject()(val userRepository: UserRepository)(implicit e
 
   def readAny[T](field: String, value: T): Future[Either[String, UserModel]] = {
     for {
-      user <- userRepository.readAny(field, value)
+      user <- userRepoTrait.readAny(field, value)
       res = user.map { item: UserModel =>
         Right(item)
       }
@@ -66,10 +69,9 @@ class RepositoryService @Inject()(val userRepository: UserRepository)(implicit e
   def partialUpdate[T](
       login: String,
       field: String,
-      value: T,
-//      request: Request[JsValue]
+      value: T
   ): Future[Either[String, UserModel]] = {
-    userRepository.partialUpdate(login, field, value).map {
+    userRepoTrait.partialUpdate(login, field, value).map {
       case Some(user) => Right(user)
       case _ => Left("ERROR: User not updated.")
     }

@@ -56,7 +56,6 @@ class ApplicationControllerSpec extends BaseSpecWithApplication with BeforeAndAf
       beforeEach()
       val fetchedResult: Future[Result] = (TestApplicationController.displayUser("Vedant-N421")(FakeRequest()))
       assert(status(fetchedResult) == Status.OK)
-//      assert(contentAsJson(fetchedResult).as[JsValue] == Json.toJson(views.html.displayuser(me)))
     }
   }
 
@@ -65,8 +64,9 @@ class ApplicationControllerSpec extends BaseSpecWithApplication with BeforeAndAf
       beforeEach()
       val request: FakeRequest[JsValue] =
         buildPost("/create").withBody[JsValue](Json.toJson(me))
-      val createdResult: Result = await(TestApplicationController.create()(request))
-      assert(createdResult.header.status == Status.CREATED)
+      val createdResult: Future[Result] = (TestApplicationController.create()(request))
+      assert(status(createdResult) == Status.CREATED)
+      assert(contentAsJson(createdResult).as[JsValue] == Json.toJson(me))
     }
   }
 
