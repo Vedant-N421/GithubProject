@@ -323,5 +323,4 @@ class ApplicationControllerSpec extends BaseSpecWithApplication with BeforeAndAf
       assert(deleteResult.header.status == Status.BAD_REQUEST)
     }
   }
-
 }

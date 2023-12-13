@@ -75,4 +75,11 @@ class ApplicationController @Inject()(
         case Left(error) => (BadRequest(Json.toJson(error)))
       }
     }
+
+  def showRepositories(login: String): Action[AnyContent] = Action.async {
+    gitHubConnector.getRepos[RepoModel](login = login).map {
+      case Right(repoList: List[RepoModel]) => Ok(views.html.displayrepos(repoList))
+      case Left(err: String) => BadRequest(Json.toJson(err))
+    }
+  }
 }
