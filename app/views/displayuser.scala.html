@@ -2,14 +2,11 @@
 @(userModel: UserModel)
 
 @main("Display User"){
-    <h1>GitHub API Project Testing</h1>
+    <h1>GitHub Details for <a target="_blank" href="@userModel.url">@userModel.login</a></h1>
   <b>
-      User: @userModel.login <br><br>
-      ID: @userModel.id <br><br>
-      URL: @userModel.url <br><br>
-      Node ID: @userModel.node_id <br><br>
-      Created: @userModel.created_at <br><br>
-      Follower count: @userModel.followers <br><br>
-      Following count: @userModel.following <br><br>
+      Date account created: @userModel.created_at <br><br>
+      Follower(s): @userModel.followers <br><br>
+      Following: @userModel.following <br><br>
   </b>
+    <a target="_blank" href="@routes.ApplicationController.showRepositories(userModel.login)">View public repositories</a>
 }

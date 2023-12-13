@@ -1,5 +1,6 @@
 package repositories
 
+import com.google.inject.ImplementedBy
 import models.UserModel
 import org.mongodb.scala.bson.conversions.Bson
 import org.mongodb.scala.model.Filters.empty
@@ -10,6 +11,23 @@ import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
+
+@ImplementedBy(classOf[UserRepository])
+trait UserRepoTrait {
+  def index(): Future[Either[String, Seq[UserModel]]]
+
+  def create(user: UserModel): Future[Option[UserModel]]
+
+  def read(login: String): Future[Option[UserModel]]
+
+  def readAny[T](field: String, value: T): Future[Option[UserModel]]
+
+  def update(login: String, user: UserModel): Future[result.UpdateResult]
+
+  def partialUpdate[T](login: String, field: String, value: T): Future[Option[UserModel]]
+
+  def delete(login: String): Future[Either[String, result.DeleteResult]]
+}
 
 @Singleton
 class UserRepository @Inject()(mongoComponent: MongoComponent)(implicit ec: ExecutionContext)
@@ -23,7 +41,8 @@ class UserRepository @Inject()(mongoComponent: MongoComponent)(implicit ec: Exec
         )
       ),
       replaceIndexes = false
-    ) {
+    )
+    with UserRepoTrait {
 
   def index(): Future[Either[String, Seq[UserModel]]] =
     collection.find().toFuture().map {

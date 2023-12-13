@@ -1,6 +1,6 @@
 package connectors
 
-import models.UserModel
+import models.{RepoModel, UserModel}
 import play.api.libs.json.OFormat
 import play.api.libs.ws.{WSClient, WSResponse}
 
@@ -18,6 +18,22 @@ class GitHubConnector @Inject()(ws: WSClient) {
     response
       .map { result =>
         Right(result.json.as[UserModel])
+      }
+      .recover {
+        case _: WSResponse =>
+          Left("Could not connect to Github API.")
+      }
+  }
+
+  def getRepos[Response](
+      login: String = "404",
+      url: String = "https://api.github.com/users/"
+  )(implicit rds: OFormat[Response], ec: ExecutionContext): Future[Either[String, List[RepoModel]]] = {
+    val request = ws.url(url + login + "/repos")
+    val response = request.get()
+    response
+      .map { result =>
+        Right(result.json.as[List[RepoModel]])
       }
       .recover {
         case _: WSResponse =>
