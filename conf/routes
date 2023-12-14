@@ -9,7 +9,7 @@ GET     /                           controllers.HomeController.index()
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
 
-GET     /users/:login            controllers.ApplicationController.displayUser(login: String)
+GET     /github/users/:login            controllers.ApplicationController.displayUser(login: String)
 
 GET     /api                        controllers.ApplicationController.index
 POST    /create                     controllers.ApplicationController.create()
@@ -17,4 +17,5 @@ GET     /read/:login                controllers.ApplicationController.read(login
 PUT     /update/:login              controllers.ApplicationController.update(login: String)
 DELETE  /delete/:login              controllers.ApplicationController.delete(login: String)
 
-GET     /users/:login/repositories  controllers.ApplicationController.showRepositories(login: String)
+GET     /github/users/:login/repositories  controllers.ApplicationController.showRepositories(login: String)
+GET     /github/users/:login/repos/:repoName  controllers.ApplicationController.showContents(login: String, repoName: String)

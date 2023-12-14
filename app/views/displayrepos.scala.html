@@ -5,7 +5,7 @@
     <h1>GitHub Repositories</h1>
     <b>
         @for(repo <- repoModel){
-            <li><a target="_blank" href="@repo.url">@repo.name</a></li>
+            <li><a target="_blank" href="@routes.ApplicationController.showContents(repo.owner.login, repo.name)">@repo.name</a></li>
         }
     </b>
 }
