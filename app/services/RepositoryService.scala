@@ -12,11 +12,24 @@ import scala.concurrent.{ExecutionContext, Future}
 class RepositoryService @Inject()(
     val userRepoTrait: UserRepoTrait
 )(implicit executionContext: ExecutionContext) {
+  def getContents(login: String, repoName: String): Future[Either[String, List[ContentModel]]] = {
+    userRepoTrait.getContents(login, repoName).map {
+      case Some(contentList: List[ContentModel]) => Right(contentList)
+      case _ => Left("Error could not fetch content of repository.")
+    }
+  }
+
+  def getRepos(login: String): Future[Either[String, List[RepoModel]]] = {
+    userRepoTrait.getRepos(login).map {
+      case Some(repoList: List[RepoModel]) => Right(repoList)
+      case _ => Left("ERROR: Could not fetch repositories.")
+    }
+  }
 
   def index(): Future[Either[String, Seq[UserModel]]] = {
     userRepoTrait.index().map {
       case Right(item: Seq[UserModel]) => Right(item)
-      case Left(error: String) => Left(error)
+      case Left(_) => Left("Users cannot be found!")
     }
   }
 
@@ -76,4 +89,5 @@ class RepositoryService @Inject()(
       case _ => Left("ERROR: User not updated.")
     }
   }
+
 }

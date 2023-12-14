@@ -77,8 +77,15 @@ class ApplicationController @Inject()(
     }
 
   def showRepositories(login: String): Action[AnyContent] = Action.async {
-    gitHubConnector.getRepos[RepoModel](login = login).map {
+    repositoryService.getRepos(login).map {
       case Right(repoList: List[RepoModel]) => Ok(views.html.displayrepos(repoList))
+      case Left(err: String) => BadRequest(Json.toJson(err))
+    }
+  }
+
+  def showContents(login: String, repoName: String): Action[AnyContent] = Action.async {
+    repositoryService.getContents(login, repoName).map {
+      case Right(contentList: List[ContentModel]) => Ok(views.html.displaycontents(contentList, repoName))
       case Left(err: String) => BadRequest(Json.toJson(err))
     }
   }

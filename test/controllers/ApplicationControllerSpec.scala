@@ -4,6 +4,7 @@ import baseSpec.BaseSpecWithApplication
 import models.UserModel
 import org.scalatest.BeforeAndAfterEach
 import play.api.http.Status
+import play.api.http.Status.OK
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.Result
 import play.api.test.FakeRequest
@@ -324,4 +325,5 @@ class ApplicationControllerSpec extends BaseSpecWithApplication with BeforeAndAf
       assert(deleteResult.header.status == Status.BAD_REQUEST)
     }
   }
+
 }

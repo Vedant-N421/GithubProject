@@ -1,7 +1,8 @@
 package repositories
 
 import com.google.inject.ImplementedBy
-import models.UserModel
+import connectors.GitHubConnector
+import models.{ContentModel, RepoModel, UserModel}
 import org.mongodb.scala.bson.conversions.Bson
 import org.mongodb.scala.model.Filters.empty
 import org.mongodb.scala.model.{Filters, IndexModel, Indexes, ReplaceOptions}
@@ -14,6 +15,10 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @ImplementedBy(classOf[UserRepository])
 trait UserRepoTrait {
+  def getContents(login: String, repoName: String): Future[Option[List[ContentModel]]]
+
+  def getRepos(login: String): Future[Option[List[RepoModel]]]
+
   def index(): Future[Either[String, Seq[UserModel]]]
 
   def create(user: UserModel): Future[Option[UserModel]]
@@ -30,8 +35,9 @@ trait UserRepoTrait {
 }
 
 @Singleton
-class UserRepository @Inject()(mongoComponent: MongoComponent)(implicit ec: ExecutionContext)
-    extends PlayMongoRepository[UserModel](
+class UserRepository @Inject()(mongoComponent: MongoComponent, gitHubConnector: GitHubConnector)(
+    implicit ec: ExecutionContext
+) extends PlayMongoRepository[UserModel](
       collectionName = "userModels",
       mongoComponent = mongoComponent,
       domainFormat = UserModel.formats,
@@ -43,6 +49,20 @@ class UserRepository @Inject()(mongoComponent: MongoComponent)(implicit ec: Exec
       replaceIndexes = false
     )
     with UserRepoTrait {
+
+  def getRepos(login: String): Future[Option[List[RepoModel]]] = {
+    gitHubConnector.getRepos[RepoModel](login).map {
+      case Right(repos: List[RepoModel]) => Some(repos)
+      case Left(_) => None
+    }
+  }
+
+  def getContents(login: String, repoName: String): Future[Option[List[ContentModel]]] = {
+    gitHubConnector.getContents[ContentModel](login, repoName).map {
+      case Right(contentList: List[ContentModel]) => Some(contentList)
+      case Left(_) => None
+    }
+  }
 
   def index(): Future[Either[String, Seq[UserModel]]] =
     collection.find().toFuture().map {
