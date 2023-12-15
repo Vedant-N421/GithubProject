@@ -12,8 +12,16 @@ import scala.concurrent.{ExecutionContext, Future}
 class RepositoryService @Inject()(
     val userRepoTrait: UserRepoTrait
 )(implicit executionContext: ExecutionContext) {
-  def getContents(login: String, repoName: String): Future[Either[String, List[ContentModel]]] = {
-    userRepoTrait.getContents(login, repoName).map {
+//  def getFiles(login: String,
+//               repoName: String,
+//               path: String): Future[Either[String, Either[List[ContentModel], ContentModel]]] = {
+//    userRepoTrait.getFiles(login, repoName, path).map{
+//
+//    }
+//  }
+
+  def getContents(login: String, repoName: String, path: Option[String]): Future[Either[String, List[ContentModel]]] = {
+    userRepoTrait.getContents(login, repoName, path).map {
       case Some(contentList: List[ContentModel]) => Right(contentList)
       case _ => Left("Error could not fetch content of repository.")
     }

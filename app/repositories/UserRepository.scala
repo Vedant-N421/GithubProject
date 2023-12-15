@@ -15,7 +15,9 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @ImplementedBy(classOf[UserRepository])
 trait UserRepoTrait {
-  def getContents(login: String, repoName: String): Future[Option[List[ContentModel]]]
+//  def getFiles(login: String, repoName: String, path: String): Future[Option[Either[List[ContentModel], ContentModel]]]
+
+  def getContents(login: String, repoName: String, path: Option[String]): Future[Option[List[ContentModel]]]
 
   def getRepos(login: String): Future[Option[List[RepoModel]]]
 
@@ -57,8 +59,8 @@ class UserRepository @Inject()(mongoComponent: MongoComponent, gitHubConnector: 
     }
   }
 
-  def getContents(login: String, repoName: String): Future[Option[List[ContentModel]]] = {
-    gitHubConnector.getContents[ContentModel](login, repoName).map {
+  def getContents(login: String, repoName: String, path: Option[String]): Future[Option[List[ContentModel]]] = {
+    gitHubConnector.getContents[ContentModel](login, repoName, None).map {
       case Right(contentList: List[ContentModel]) => Some(contentList)
       case Left(_) => None
     }

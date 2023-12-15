@@ -1,0 +1,9 @@
+@import models._
+@(file: ContentModel, repoName: String, path: String)
+
+@main(s"Contents of ${file.name}"){
+    <h1>Contents of @file.name</h1>
+    <b>
+        @file.content
+    </b>
+}
