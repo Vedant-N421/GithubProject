@@ -50,7 +50,6 @@ class GitHubConnector @Inject()(ws: WSClient) {
       case Some(s) => ws.url(s"https://api.github.com/repos/$login/$repoName/contents/$s")
       case None => ws.url(s"https://api.github.com/repos/$login/$repoName/contents")
     }
-//    val request = ws.url("https://api.github.com/repos/" + login + "/" + repo + "/contents/")
     val response = request.get()
     response
       .map { result =>

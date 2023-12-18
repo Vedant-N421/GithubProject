@@ -1,16 +1,11 @@
 @import models._
-@(contentModel: List[ContentModel], repoName: String)
+@(contentModel: List[ContentModel], repoName: String, login: String, path: Option[String])
 
 @main(s"Contents of $repoName"){
     <h1>Contents of @repoName</h1>
     <b>
     @for(file <- contentModel){
-        @if(file.`type`=="file"){
-            <li><a target="_blank" href="@file.url">@file.name</a></li>
-        }
-        @if(file.`type`=="dir"){
-            <li><a target="_blank" href="@routes.ApplicationController.showContents()">@file.name</a></li>
-        }
+        <li><a target="_blank" href="@routes.ApplicationController.showContents(login, repoName, path)">@file.name</a></li>
     }
     </b>
 }
