@@ -1,7 +1,7 @@
 package connectors
 
 import models.{ContentModel, RepoModel, UserModel}
-import play.api.libs.json.OFormat
+import play.api.libs.json.{JsError, JsSuccess, OFormat}
 import play.api.libs.ws.{WSClient, WSResponse}
 
 import javax.inject.Inject
@@ -51,10 +51,16 @@ class GitHubConnector @Inject()(ws: WSClient) {
     val url = s"https://api.github.com/repos/$login/$repoName/contents"
     val request = ws.url(url + path)
     val response = request.get()
-
     response
       .map { result =>
-        Right(result.json.as[List[ContentModel]])
+        result.json.validate[List[ContentModel]] match {
+          case JsSuccess(ls, _) => Right(ls)
+          case e: JsError =>
+            result.json.validate[ContentModel] match {
+              case JsSuccess(cm, _) => Right(List(cm))
+            }
+        }
+//        Right(result.json.as[List[ContentModel]])
       }
       .recover {
         case _: WSResponse =>
