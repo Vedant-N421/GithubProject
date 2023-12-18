@@ -15,27 +15,8 @@ class RepositoryService @Inject()(
     val userRepoTrait: UserRepoTrait,
     gitHubConnector: GitHubConnector
 )(implicit executionContext: ExecutionContext) {
-//  def getFiles(login: String,
-//               repoName: String,
-//               path: String): Future[Either[String, Either[List[ContentModel], ContentModel]]] = {
-//    userRepoTrait.getFiles(login, repoName, path).map{
-//
-//    }
-//  }
 
-//  def getContents(login: String, repoName: String, path: Option[String]): Future[Either[String, List[ContentModel]]] = {
-//    userRepoTrait.getContents(login, repoName, path).map {
-//      case Some(contentList: List[ContentModel]) =>
-//        contentList.map {
-//          case _ if contentList.head.`type` == "file" && contentList.length == 1 =>
-//            Right(userRepoTrait.getContents(contentList.head, repoName, path))
-//          case _ => Right(views.html.displaycontents(contentList, repoName, login, path))
-//        }
-//      case _ => Left("Error could not fetch content of repository.")
-//    }
-//  }
-
-  def getContents(login: String, repoName: String, path: Option[String]): Future[Either[String, Html]] = {
+  def getContents(login: String, repoName: String, path: String): Future[Either[String, Html]] = {
     gitHubConnector.getContents[ContentModel](login, repoName, path).map {
       case Right(ls: List[ContentModel]) =>
         ls match {

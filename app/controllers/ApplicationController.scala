@@ -83,30 +83,11 @@ class ApplicationController @Inject()(
     }
   }
 
-  def showContents(login: String, repoName: String, path: Option[String]): Action[AnyContent] = Action.async {
-    repositoryService.getContents(login, repoName, path).map{
+  def showContents(login: String, repoName: String, path: String): Action[AnyContent] = Action.async {
+    repositoryService.getContents(login, repoName, path).map {
       case Right(webpage) => Ok(webpage)
       case Left(err: String) => BadRequest(Json.toJson(err))
     }
   }
 
-  def showContents(login: String, repoName: String, path: Option[String]): Action[AnyContent] = Action.async {
-    repositoryService.getContents(login, repoName, path).map {
-      case Right(contentList: List[ContentModel]) =>
-        contentList.map {
-          case _ if contentList.head.`type` == "file" && contentList.length == 1 =>
-            Ok(views.html.displayfile(contentList.head, repoName, path))
-          case _ => Ok(views.html.displaycontents(contentList, repoName, login, path))
-        }
-      case Left(err: String) => BadRequest(Json.toJson(err))
-    }
-  }
-
-//  def findFiles(login: String, repoName: String, path: Option[String]): Action[AnyContent] = Action.async {
-//    repositoryService.getContents(login, repoName, path).map {
-//      case Right(Right(file: ContentModel)) => TODO
-//      case Right(Left(dir: List[ContentModel])) => TODO
-//      case Left(_) => BadRequest
-//    }
-//  }
 }

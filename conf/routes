@@ -18,5 +18,5 @@ PUT     /update/:login              controllers.ApplicationController.update(log
 DELETE  /delete/:login              controllers.ApplicationController.delete(login: String)
 
 GET     /github/users/:login/repositories               controllers.ApplicationController.showRepositories(login: String)
-#GET     /github/users/:login/repos/:repoName            controllers.ApplicationController.showContents(login: String, repoName: String, path: Option[String])
-GET     /github/users/:login/repos/:repoName/*path      controllers.ApplicationController.showContents(login: String, repoName: String, path: Option[String])
+GET     /github/users/:login/repos/:repoName            controllers.ApplicationController.showContents(login: String, repoName: String, path: String = "")
+GET     /github/users/:login/repos/:repoName/*path      controllers.ApplicationController.showContents(login: String, repoName: String, path: String)

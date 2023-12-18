@@ -2,10 +2,10 @@
 @(repoModel: List[RepoModel])
 
 @main("Display User"){
-    <h1>GitHub Repositories</h1>
+    <h1>GitHub Repository List</h1>
     <b>
         @for(repo <- repoModel){
-            <li><a target="_blank" href="@routes.ApplicationController.showContents(repo.owner.login, repo.name)">@repo.name</a></li>
+            <li><a href="@routes.ApplicationController.showContents(repo.owner.login, repo.name, "")">@repo.name</a></li>
         }
     </b>
 }

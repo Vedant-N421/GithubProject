@@ -13,6 +13,7 @@ class GitHubConnector @Inject()(ws: WSClient) {
       url: String = "https://api.github.com/users/"
   )(implicit rds: OFormat[Response], ec: ExecutionContext): Future[Either[String, UserModel]] = {
     val request = ws.url(url + login)
+    print(s"REQUEST =====> ${url + login}")
     val response = request.get()
 
     response
@@ -44,13 +45,13 @@ class GitHubConnector @Inject()(ws: WSClient) {
   def getContents[Response](
       login: String = "404",
       repoName: String,
-      path: Option[String]
+      path: String
   )(implicit rds: OFormat[Response], ec: ExecutionContext): Future[Either[String, List[ContentModel]]] = {
-    val request = path match {
-      case Some(s) => ws.url(s"https://api.github.com/repos/$login/$repoName/contents/$s")
-      case None => ws.url(s"https://api.github.com/repos/$login/$repoName/contents")
-    }
+    print(s" login = $login repoName = $repoName and path = $path")
+    val url = s"https://api.github.com/repos/$login/$repoName/contents"
+    val request = ws.url(url + path)
     val response = request.get()
+
     response
       .map { result =>
         Right(result.json.as[List[ContentModel]])
@@ -60,22 +61,5 @@ class GitHubConnector @Inject()(ws: WSClient) {
           Left("Could not connect to Github API.")
       }
   }
-
-//  def getFiles[Response](
-//      login: String = "404",
-//      repoName: String,
-//      path: String
-//  )(implicit rds: OFormat[Response], ec: ExecutionContext): Future[Either[String, List[ContentModel]]] = {
-//    val request = ws.url(s"https://api.github.com/repos/$login/$repoName/contents/$path")
-//    val response = request.get()
-//    response
-//      .map { result =>
-//        Right(result.json.as[List[ContentModel]])
-//      }
-//      .recover {
-//        case _: WSResponse =>
-//          Left("Could not connect to Github API.")
-//      }
-//  }
 
 }
