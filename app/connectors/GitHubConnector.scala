@@ -13,7 +13,6 @@ class GitHubConnector @Inject()(ws: WSClient) {
       url: String = "https://api.github.com/users/"
   )(implicit rds: OFormat[Response], ec: ExecutionContext): Future[Either[String, UserModel]] = {
     val request = ws.url(url + login)
-    print(s"REQUEST =====> ${url + login}")
     val response = request.get()
 
     response
@@ -60,12 +59,10 @@ class GitHubConnector @Inject()(ws: WSClient) {
               case JsSuccess(cm, _) => Right(List(cm))
             }
         }
-//        Right(result.json.as[List[ContentModel]])
       }
       .recover {
         case _: WSResponse =>
           Left("Could not connect to Github API.")
       }
   }
-
 }
