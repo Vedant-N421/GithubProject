@@ -2,7 +2,7 @@ package repositories
 
 import com.google.inject.ImplementedBy
 import connectors.GitHubConnector
-import models.{ContentModel, RepoModel, UserModel}
+import models.UserModel
 import org.mongodb.scala.bson.conversions.Bson
 import org.mongodb.scala.model.Filters.empty
 import org.mongodb.scala.model.{Filters, IndexModel, Indexes, ReplaceOptions}
@@ -15,9 +15,11 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @ImplementedBy(classOf[UserRepository])
 trait UserRepoTrait {
-  def getContents(login: String, repoName: String): Future[Option[List[ContentModel]]]
+//  def getFiles(login: String, repoName: String, path: String): Future[Option[Either[List[ContentModel], ContentModel]]]
 
-  def getRepos(login: String): Future[Option[List[RepoModel]]]
+//  def getContents(login: String, repoName: String, path: Option[String]): Future[Option[List[ContentModel]]]
+//
+//  def getRepos(login: String): Future[Option[List[RepoModel]]]
 
   def index(): Future[Either[String, Seq[UserModel]]]
 
@@ -50,19 +52,19 @@ class UserRepository @Inject()(mongoComponent: MongoComponent, gitHubConnector: 
     )
     with UserRepoTrait {
 
-  def getRepos(login: String): Future[Option[List[RepoModel]]] = {
-    gitHubConnector.getRepos[RepoModel](login).map {
-      case Right(repos: List[RepoModel]) => Some(repos)
-      case Left(_) => None
-    }
-  }
-
-  def getContents(login: String, repoName: String): Future[Option[List[ContentModel]]] = {
-    gitHubConnector.getContents[ContentModel](login, repoName).map {
-      case Right(contentList: List[ContentModel]) => Some(contentList)
-      case Left(_) => None
-    }
-  }
+//  def getRepos(login: String): Future[Option[List[RepoModel]]] = {
+//    gitHubConnector.getRepos[RepoModel](login).map {
+//      case Right(repos: List[RepoModel]) => Some(repos)
+//      case Left(_) => None
+//    }
+//  }
+//
+//  def getContents(login: String, repoName: String, path: Option[String]): Future[Option[List[ContentModel]]] = {
+//    gitHubConnector.getContents[ContentModel](login, repoName, None).map {
+//      case Right(contentList: List[ContentModel]) => Some(contentList)
+//      case Left(_) => None
+//    }
+//  }
 
   def index(): Future[Either[String, Seq[UserModel]]] =
     collection.find().toFuture().map {

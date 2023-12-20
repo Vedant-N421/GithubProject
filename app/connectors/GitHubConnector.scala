@@ -1,7 +1,7 @@
 package connectors
 
 import models.{ContentModel, RepoModel, UserModel}
-import play.api.libs.json.OFormat
+import play.api.libs.json.{JsError, JsSuccess, OFormat}
 import play.api.libs.ws.{WSClient, WSResponse}
 
 import javax.inject.Inject
@@ -43,18 +43,26 @@ class GitHubConnector @Inject()(ws: WSClient) {
 
   def getContents[Response](
       login: String = "404",
-      repo: String
+      repoName: String,
+      path: String
   )(implicit rds: OFormat[Response], ec: ExecutionContext): Future[Either[String, List[ContentModel]]] = {
-    val request = ws.url("https://api.github.com/repos/" + login + "/" + repo + "/contents/")
+    print(s" login = $login repoName = $repoName and path = $path")
+    val url = s"https://api.github.com/repos/$login/$repoName/contents"
+    val request = ws.url(url + path)
     val response = request.get()
     response
       .map { result =>
-        Right(result.json.as[List[ContentModel]])
+        result.json.validate[List[ContentModel]] match {
+          case JsSuccess(ls, _) => Right(ls)
+          case e: JsError =>
+            result.json.validate[ContentModel] match {
+              case JsSuccess(cm, _) => Right(List(cm))
+            }
+        }
       }
       .recover {
         case _: WSResponse =>
           Left("Could not connect to Github API.")
       }
   }
-
 }

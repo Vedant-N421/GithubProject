@@ -1,28 +1,37 @@
 package services
 
 import com.mongodb.client.result.DeleteResult
+import connectors.GitHubConnector
 import models._
 import play.api.libs.json.{JsError, JsSuccess, JsValue}
 import play.api.mvc.Request
+import play.twirl.api.Html
 import repositories.UserRepoTrait
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class RepositoryService @Inject()(
-    val userRepoTrait: UserRepoTrait
+    val userRepoTrait: UserRepoTrait,
+    gitHubConnector: GitHubConnector
 )(implicit executionContext: ExecutionContext) {
-  def getContents(login: String, repoName: String): Future[Either[String, List[ContentModel]]] = {
-    userRepoTrait.getContents(login, repoName).map {
-      case Some(contentList: List[ContentModel]) => Right(contentList)
-      case _ => Left("Error could not fetch content of repository.")
+
+  def getContents(login: String, repoName: String, path: String): Future[Either[String, Html]] = {
+    gitHubConnector.getContents[ContentModel](login, repoName, path).map {
+      case Right(ls: List[ContentModel]) =>
+        ls match {
+          case _ if ls.head.`type` == "file" && ls.length == 1 =>
+            Right(views.html.displayfile(ls.head, repoName, path))
+          case _ => Right(views.html.displaycontents(ls, repoName, login, path))
+        }
+      case Left(err) => Left(err)
     }
   }
 
-  def getRepos(login: String): Future[Either[String, List[RepoModel]]] = {
-    userRepoTrait.getRepos(login).map {
-      case Some(repoList: List[RepoModel]) => Right(repoList)
-      case _ => Left("ERROR: Could not fetch repositories.")
+  def getRepos(login: String): Future[Either[String, Html]] = {
+    gitHubConnector.getRepos[RepoModel](login).map {
+      case Right(ls: List[RepoModel]) => Right(views.html.displayrepos(ls))
+      case Left(err) => Left(err)
     }
   }
 
