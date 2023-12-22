@@ -1,11 +1,13 @@
-@import models._
-@(contentModel: List[ContentModel], repoName: String, login: String, path: String)
+@import viewmodels.ContentViewModel
+@(contentViewModel: ContentViewModel)
 
-@main(s"Contents of $repoName"){
-    <h1>@repoName/@(path)</h1>
+@main(s"Contents of ${contentViewModel.repoName}"){
+  <div id="repository_contents">
+    <h1>@contentViewModel.repoName/@(contentViewModel.path)</h1>
     <b>
-    @for(file <- contentModel){
-        <li><a href="@routes.ApplicationController.showContents(login, repoName, s"${path + file.name}/")">@file.name</a></li>
+    @for(file <- contentViewModel.fileList.getOrElse(List())){
+        <li><a href="@routes.ApplicationController.showContents(contentViewModel.login, contentViewModel.repoName, s"${contentViewModel.path + file.name}/")">@file.name</a></li>
     }
     </b>
+  </div>
 }

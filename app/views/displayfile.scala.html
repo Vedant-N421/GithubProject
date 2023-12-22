@@ -1,12 +1,12 @@
-@import models._
-@(file: ContentModel, repoName: String, path: String)
+@import viewmodels.ContentViewModel
+@(contentViewModel: ContentViewModel)
 
-@main(s"Contents of ${file.name}"){
-  <div id="test1">
-    <h1>Contents of @file.name</h1>
+@main(s"Contents of ${contentViewModel.file.get.name}"){
+  <div id="file_content">
+    <h1>Contents of @contentViewModel.file.get.name</h1>
     <p><code>
     @{
-        val textDecoded = new String(java.util.Base64.getMimeDecoder.decode(file.content.getOrElse("")))
+        val textDecoded = new String(java.util.Base64.getMimeDecoder.decode(contentViewModel.file.get.content.getOrElse("")))
         textDecoded
     }
     </code></p>

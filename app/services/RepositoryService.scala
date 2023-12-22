@@ -5,8 +5,8 @@ import connectors.GitHubConnector
 import models._
 import play.api.libs.json.{JsError, JsSuccess, JsValue}
 import play.api.mvc.Request
-import play.twirl.api.Html
 import repositories.UserRepoTrait
+import viewmodels.{ContentViewModel, RepoListViewModel}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -15,23 +15,22 @@ class RepositoryService @Inject()(
     val userRepoTrait: UserRepoTrait,
     val gitHubConnector: GitHubConnector
 )(implicit executionContext: ExecutionContext) {
-  // return -> Future[Either[String, ViewModel]]
-  // All the info you need for the view you get in service, and pass it into the view through the controller
-  def getContents(login: String, repoName: String, path: String): Future[Either[String, Html]] = {
+
+  def getContents(login: String, repoName: String, path: String): Future[Either[String, ContentViewModel]] = {
     gitHubConnector.getContents[ContentModel](login, repoName, path).map {
       case Right(ls: List[ContentModel]) =>
         ls match {
           case _ if ls.head.`type` == "file" && ls.length == 1 =>
-            Right(views.html.displayfile(ls.head, repoName, path))
-          case _ => Right(views.html.displaycontents(ls, repoName, login, path))
+            Right(ContentViewModel(Some(ls.head), None, repoName, path, login))
+          case _ => Right(ContentViewModel(None, Some(ls), repoName, path, login))
         }
       case Left(err) => Left(err)
     }
   }
 
-  def getRepos(login: String): Future[Either[String, Html]] = {
+  def getRepos(login: String): Future[Either[String, RepoListViewModel]] = {
     gitHubConnector.getRepos[RepoModel](login).map {
-      case Right(ls: List[RepoModel]) => Right(views.html.displayrepos(ls))
+      case Right(ls: List[RepoModel]) => Right(RepoListViewModel(ls))
       case Left(err) => Left(err)
     }
   }

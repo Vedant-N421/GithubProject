@@ -1,10 +1,10 @@
-@import models._
-@(repoModel: List[RepoModel])
+@import viewmodels.RepoListViewModel
+@(repoListViewModel: RepoListViewModel)
 
 @main("Display User"){
     <h1>GitHub Repository List</h1>
     <b>
-        @for(repo <- repoModel){
+        @for(repo <- repoListViewModel.ls){
             <li><a href="@routes.ApplicationController.showContents(repo.owner.login, repo.name, "")">@repo.name</a></li>
         }
     </b>
