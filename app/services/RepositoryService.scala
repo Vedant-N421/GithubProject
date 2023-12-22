@@ -13,9 +13,10 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class RepositoryService @Inject()(
     val userRepoTrait: UserRepoTrait,
-    gitHubConnector: GitHubConnector
+    val gitHubConnector: GitHubConnector
 )(implicit executionContext: ExecutionContext) {
-
+  // return -> Future[Either[String, ViewModel]]
+  // All the info you need for the view you get in service, and pass it into the view through the controller
   def getContents(login: String, repoName: String, path: String): Future[Either[String, Html]] = {
     gitHubConnector.getContents[ContentModel](login, repoName, path).map {
       case Right(ls: List[ContentModel]) =>
@@ -43,14 +44,21 @@ class RepositoryService @Inject()(
   }
 
   def create(request: Request[JsValue]): Future[Either[String, UserModel]] = {
-    request.body.validate[UserModel] match {
-      case JsSuccess(user, _) =>
-        userRepoTrait.create(user).map {
-          case None => Left("ERROR: Duplicate found, item not created.")
-          case _ => Right(user)
+    request.body
+      .validate[UserModel]
+      .fold(
+        errors => {
+          Future(Left("ERROR: User not created."))
+        },
+        userData => {
+          userRepoTrait.create(userData).map {
+            case None =>
+              Left("ERROR: Duplicate found, item not created.")
+            case _ =>
+              Right(userData)
+          }
         }
-      case JsError(_) => Future(Left("ERROR: User not created."))
-    }
+      )
   }
 
   def update(id: String, request: Request[JsValue]): Future[Either[String, UserModel]] = {

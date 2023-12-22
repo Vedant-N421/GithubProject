@@ -1,14 +1,14 @@
 @import models._
-@import java.util.Base64
-@import java.nio.charset.StandardCharsets
 @(file: ContentModel, repoName: String, path: String)
 
 @main(s"Contents of ${file.name}"){
+  <div id="test1">
     <h1>Contents of @file.name</h1>
-    <b>
-        @{
-            val textDecoded = new String(java.util.Base64.getMimeDecoder.decode(file.content.getOrElse("")))
-            textDecoded
-        }
-    </b>
+    <p><code>
+    @{
+        val textDecoded = new String(java.util.Base64.getMimeDecoder.decode(file.content.getOrElse("")))
+        textDecoded
+    }
+    </code></p>
+  </div>
 }

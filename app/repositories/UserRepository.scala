@@ -158,7 +158,7 @@ class UserRepository @Inject()(mongoComponent: MongoComponent, gitHubConnector: 
           case _ => user
         }
         update(login, updatedUser).map(thing => Some(updatedUser))
-      case _ => Future.successful(None)
+      case _ => Future(None)
     }
   }
 

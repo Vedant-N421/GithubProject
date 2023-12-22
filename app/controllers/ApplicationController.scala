@@ -89,5 +89,4 @@ class ApplicationController @Inject()(
       case Left(err: String) => BadRequest(Json.toJson(err))
     }
   }
-
 }
