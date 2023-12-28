@@ -52,20 +52,6 @@ class UserRepository @Inject()(mongoComponent: MongoComponent, gitHubConnector: 
     )
     with UserRepoTrait {
 
-//  def getRepos(login: String): Future[Option[List[RepoModel]]] = {
-//    gitHubConnector.getRepos[RepoModel](login).map {
-//      case Right(repos: List[RepoModel]) => Some(repos)
-//      case Left(_) => None
-//    }
-//  }
-//
-//  def getContents(login: String, repoName: String, path: Option[String]): Future[Option[List[ContentModel]]] = {
-//    gitHubConnector.getContents[ContentModel](login, repoName, None).map {
-//      case Right(contentList: List[ContentModel]) => Some(contentList)
-//      case Left(_) => None
-//    }
-//  }
-
   def index(): Future[Either[String, Seq[UserModel]]] =
     collection.find().toFuture().map {
       case users: Seq[UserModel] => Right(users)

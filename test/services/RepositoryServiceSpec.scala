@@ -3,18 +3,18 @@ package services
 import baseSpec.BaseSpec
 import com.mongodb.client.result.UpdateResult
 import connectors.GitHubConnector
-import models.{ContentModel, UserModel}
+import models.{ContentModel, RepoModel, UserModel}
 import org.mongodb.scala.result.DeleteResult
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.{JsValue, Json, OFormat}
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.CSRFTokenHelper.CSRFFRequestHeader
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{DELETE, GET, POST, PUT}
-import play.twirl.api.Html
 import repositories._
+import viewmodels.{ContentViewModel, RepoListViewModel}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -59,8 +59,8 @@ class RepositoryServiceSpec extends BaseSpec with MockFactory with ScalaFutures 
   )
 
   private val badJsonObj: JsValue = Json.obj(
-    "login" -> "ChangedLogin",
-    "id" -> 87685,
+    "hehehe" -> "ChangedLogin",
+    "i changed this bad boy" -> 87685,
     "url" -> "https://api.github.com/users/Vedant-N421",
     "node_id" -> "changednodeid",
     "created_at" -> "changeddate",
@@ -94,39 +94,48 @@ class RepositoryServiceSpec extends BaseSpec with MockFactory with ScalaFutures 
         .expects(me.as[UserModel])
         .returning(Future(Some(me.as[UserModel])))
         .once()
-      // Do I mock the request as well?
       val request: FakeRequest[JsValue] =
         buildPost("/create")
           .withBody[JsValue](Json.toJson(me))
       whenReady(testService.create(request)) {
-        case Left(err) => assert(err == "ERROR: Duplicate found, user not created.")
+        case Left(err) => assert(err == "ERROR: User not created.")
         case Right(dataModel) => assert(Json.toJson(dataModel) == me)
       }
     }
   }
 
-//  "a bad create request" should {
-//    "return an error string after failing to create an entry in the DB" in {
-//      val badObj = mock[UserModel]
-//
-//      (mockRepository.create _)
-//        .expects(_: UserModel)
-//        .returning(Future(None))
-//        .once()
-//      val request: FakeRequest[JsValue] =
-//        buildPost("/create")
-//          .withBody[JsValue](Json.toJson(me))
-//      whenReady(testService.create(request)) {
-//        case Left(err) => assert(err == "ERROR: User not created.")
-//        case Right(dataModel) => assert(Json.toJson(dataModel) == me)
-//      }
-//    }
-//  }
+  "a bad create request" should {
+    "return an error string after failing to create an entry in the DB" in {
+      (mockRepository.create _)
+        .expects(*)
+        .returning(Future(None))
+        .once()
+      val request: FakeRequest[JsValue] =
+        buildPost("/create")
+          .withBody[JsValue](Json.toJson(me))
+      whenReady(testService.create(request)) {
+        case Left(err) => assert(err == "ERROR: User not created.")
+        case Right(userModel) => assert(Json.toJson(userModel) == me)
+      }
+    }
+  }
+
+  "a bad json obj validation for the create request" should {
+    "return an error string after failing to create an entry in the DB" in {
+      val request: FakeRequest[JsValue] =
+        buildPost("/create")
+          .withBody[JsValue](Json.toJson(badJsonObj))
+      whenReady(testService.create(request)) {
+        case Left(err) => assert(err == "ERROR: User not created.")
+        case Right(userModel) => assert(Json.toJson(userModel) == me)
+      }
+    }
+  }
 
   "read" should {
     "return the user after succeeding in reading an entry in the DB" in {
       (mockRepository.read _)
-        .expects("Vedant-N421")
+        .expects(*)
         .returning(Future(Some(me.as[UserModel])))
         .once()
       whenReady(testService.read("Vedant-N421")) {
@@ -167,7 +176,7 @@ class RepositoryServiceSpec extends BaseSpec with MockFactory with ScalaFutures 
       val mockUpdateResult = mock[UpdateResult]
       (mockRepository
         .update(_: String, _: UserModel))
-        .expects("Vedant-N421", me2.as[UserModel])
+        .expects(*, *)
         .returning(Future.successful(mockUpdateResult))
         .once()
       val updateRequest: FakeRequest[JsValue] =
@@ -180,6 +189,36 @@ class RepositoryServiceSpec extends BaseSpec with MockFactory with ScalaFutures 
     }
   }
 
+  "a bad update request" should {
+    "return an error message, failing to update an entry in the DB" in {
+      val mockUpdateResult = mock[UpdateResult]
+      (mockRepository
+        .update(_: String, _: UserModel))
+        .expects(*, *)
+        .returning(Future.successful(mockUpdateResult))
+        .once()
+      val updateRequest: FakeRequest[JsValue] =
+        buildPost(s"/update/${me.as[UserModel].login}")
+          .withBody[JsValue](Json.toJson(me2.as[UserModel]))
+      whenReady(testService.update("Vedant-N421", request = updateRequest)) {
+        case Left(err: String) => assert(err == "ERROR: User not updated.")
+        case Right(userModel: UserModel) => assert(Json.toJson(userModel) == me2)
+      }
+    }
+  }
+
+  "a bad json obj validation for the update request" should {
+    "return an error string after failing to update an entry in the DB" in {
+      val updateRequest: FakeRequest[JsValue] =
+        buildPost(s"/update/${badJsonObj}")
+          .withBody[JsValue](Json.toJson(badJsonObj))
+      whenReady(testService.update("Vedant-N421", updateRequest)) {
+        case Left(err) => assert(err == "ERROR: User not updated.")
+        case Right(userModel) => assert(Json.toJson(userModel) == badJsonObj)
+      }
+    }
+  }
+
   "partialUpdate with a good request" should {
     "should partially update an entry in the DB" in {
       val mockUpdateResult = mock[UpdateResult]
@@ -188,10 +227,6 @@ class RepositoryServiceSpec extends BaseSpec with MockFactory with ScalaFutures 
         .expects(*, *, *)
         .returning(Future(None))
         .once()
-
-//      val updateRequest: FakeRequest[JsValue] =
-//        buildPost(s"/update/${me.as[UserModel].login}")
-//          .withBody[JsValue](Json.toJson(me.as[UserModel]))
 
       whenReady(testService.partialUpdate("Vedant-N421", "id", 420)) {
         case Left(err: String) => assert(err == "ERROR: User not updated.")
@@ -219,7 +254,7 @@ class RepositoryServiceSpec extends BaseSpec with MockFactory with ScalaFutures 
     "return an error string informing the user that nothing was changed" in {
       val mockDeleteResult = mock[DeleteResult]
       (mockRepository.delete _)
-        .expects("nothinghere")
+        .expects(*)
         .returning(Future.successful(Left("INFO: User not found, so no deletion made!")))
         .once()
 
@@ -230,23 +265,84 @@ class RepositoryServiceSpec extends BaseSpec with MockFactory with ScalaFutures 
     }
   }
 
-  "getContents method" should {
-    "display a file if the path route directs towards a file" in {
-      val mockContentModel: ContentModel = ContentModel("", "", "", "", Some(""))
-      val something: Html = views.html.displayfile(mockContentModel, "Scala-Training", "/Scala-101/build.sbt")
-      val somet = mock[Html]
-      (testService
-        .getContents(_: String, _: String, _: String))
-        .expects(*, *, *)
-        .returning(Future.successful(Right(something)))
+  "getContents given a single file" should {
+    "should return the view model with a good request" in {
+      val another = mock[ContentModel]
+      (gitHubConnector
+        .getContents[ContentModel](_: String, _: String, _: String)(_: OFormat[ContentModel], _: ExecutionContext))
+        .expects(*, *, *, *, *)
+        .returning(Future.successful(Right(List(another))))
         .once()
 
       whenReady(testService.getContents("Vedant-N421", "Scala-Training", "/Scala-101/build.sbt")) {
-        case Right(wp) => assert(true)
-        case Left(err) => assert(false)
+        case Right(cvm: ContentViewModel) => assert(cvm.path == "/Scala-101/build.sbt")
+        case Left(err) => assert(err == "Could not connect to Github API.")
       }
-
     }
   }
 
+  "getContents given multiple files" should {
+    "should still return the relevant view model with a good request" in {
+      val another = mock[ContentModel]
+      val onemore = mock[ContentModel]
+      val listFiles = List(another, onemore)
+      (gitHubConnector
+        .getContents[ContentModel](_: String, _: String, _: String)(_: OFormat[ContentModel], _: ExecutionContext))
+        .expects(*, *, *, *, *)
+        .returning(Future.successful(Right(listFiles)))
+        .once()
+
+      whenReady(testService.getContents("Vedant-N421", "Scala-Training", "/Scala-101/build.sbt")) {
+        case Right(cvm: ContentViewModel) => assert(cvm.file == None)
+        case Left(err) => assert(err == "Could not connect to Github API.")
+      }
+    }
+  }
+
+  "getContents given a bad request" should {
+    "return an error" in {
+      (gitHubConnector
+        .getContents[ContentModel](_: String, _: String, _: String)(_: OFormat[ContentModel], _: ExecutionContext))
+        .expects(*, *, *, *, *)
+        .returning(Future(Left("Could not connect to Github API.")))
+        .once()
+
+      whenReady(testService.getContents("Vedant-N421", "Scala-Training", "/Scala-101/build.sbt")) {
+        case Right(cvm: ContentViewModel) => assert(cvm.path == "/Scala-101/build.sbt")
+        case Left(err) => assert(err == "Could not connect to Github API.")
+      }
+    }
+  }
+
+  "getRepos given a valid login" should {
+    "return the view model for a list of repositories" in {
+      val another = mock[RepoModel]
+      (gitHubConnector
+        .getRepos[RepoModel](_: String, _: String)(_: OFormat[RepoModel], _: ExecutionContext))
+        .expects(*, *, *, *)
+        .returning(Future(Right(List(another))))
+        .once()
+
+      whenReady(testService.getRepos("Vedant-N421")) {
+        case Right(rlvm: RepoListViewModel) => assert(true)
+        case Left(err) => assert(err == "Could not connect to Github API.")
+      }
+    }
+  }
+
+  "getRepos given an invalid login" should {
+    "return the view model for a list of repositories" in {
+      val another = mock[RepoModel]
+      (gitHubConnector
+        .getRepos[RepoModel](_: String, _: String)(_: OFormat[RepoModel], _: ExecutionContext))
+        .expects(*, *, *, *)
+        .returning(Future(Left("Could not connect to Github API.")))
+        .once()
+
+      whenReady(testService.getRepos("dsjofnskdofknsdnf")) {
+        case Right(rlvm: RepoListViewModel) => assert(false)
+        case Left(err) => assert(err == "Could not connect to Github API.")
+      }
+    }
+  }
 }

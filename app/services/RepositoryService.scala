@@ -3,7 +3,7 @@ package services
 import com.mongodb.client.result.DeleteResult
 import connectors.GitHubConnector
 import models._
-import play.api.libs.json.{JsError, JsSuccess, JsValue}
+import play.api.libs.json.JsValue
 import play.api.mvc.Request
 import repositories.UserRepoTrait
 import viewmodels.{ContentViewModel, RepoListViewModel}
@@ -52,7 +52,7 @@ class RepositoryService @Inject()(
         userData => {
           userRepoTrait.create(userData).map {
             case None =>
-              Left("ERROR: Duplicate found, item not created.")
+              Left("ERROR: User not created.")
             case _ =>
               Right(userData)
           }
@@ -61,12 +61,18 @@ class RepositoryService @Inject()(
   }
 
   def update(id: String, request: Request[JsValue]): Future[Either[String, UserModel]] = {
-    request.body.validate[UserModel] match {
-      case JsSuccess(user: UserModel, _) =>
-        userRepoTrait.update(id, user)
-        Future(Right(user))
-      case JsError(_) => Future(Left("ERROR: User not updated."))
-    }
+    request.body
+      .validate[UserModel]
+      .fold(
+        errors => {
+          Future(Left("ERROR: User not updated."))
+        },
+        userData => {
+          userRepoTrait.update(id, userData).map { _ =>
+            Right(userData)
+          }
+        }
+      )
   }
 
   def read(id: String): Future[Either[String, UserModel]] = {
