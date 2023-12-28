@@ -20,7 +20,8 @@ libraryDependencies ++= Seq(
   "org.scalamock" %% "scalamock" % "5.1.0" % Test,
   "org.scalatestplus.play" %% "scalatestplus-play" % "5.0.0" % Test,
   ws,
-  "org.typelevel" %% "cats-core" % "2.3.0"
+  "org.typelevel" %% "cats-core" % "2.3.0",
+  "org.jsoup" % "jsoup" % "1.15.4"
 )
 
 dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-databind" % "2.11.0"

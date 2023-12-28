@@ -71,8 +71,8 @@ class ApplicationController @Inject()(
   def partialUpdate[T](login: String, field: String, value: T): Action[JsValue] =
     Action.async(parse.json) { implicit request =>
       repositoryService.partialUpdate(login, field, value).map {
-        case Right(user) => (Accepted(Json.toJson(user)))
-        case Left(error) => (BadRequest(Json.toJson(error)))
+        case Right(user) => Accepted(Json.toJson(user))
+        case Left(error) => BadRequest(Json.toJson(error))
       }
     }
 

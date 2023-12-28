@@ -46,7 +46,6 @@ class GitHubConnector @Inject()(ws: WSClient) {
       repoName: String,
       path: String
   )(implicit rds: OFormat[Response], ec: ExecutionContext): Future[Either[String, List[ContentModel]]] = {
-    print(s" login = $login repoName = $repoName and path = $path")
     val url = s"https://api.github.com/repos/$login/$repoName/contents"
     val request = ws.url(url + path)
     val response = request.get()
