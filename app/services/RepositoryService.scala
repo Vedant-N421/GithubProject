@@ -3,34 +3,34 @@ package services
 import com.mongodb.client.result.DeleteResult
 import connectors.GitHubConnector
 import models._
-import play.api.libs.json.{JsError, JsSuccess, JsValue}
+import play.api.libs.json.JsValue
 import play.api.mvc.Request
-import play.twirl.api.Html
 import repositories.UserRepoTrait
+import viewmodels.{ContentViewModel, RepoListViewModel}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class RepositoryService @Inject()(
     val userRepoTrait: UserRepoTrait,
-    gitHubConnector: GitHubConnector
+    val gitHubConnector: GitHubConnector
 )(implicit executionContext: ExecutionContext) {
 
-  def getContents(login: String, repoName: String, path: String): Future[Either[String, Html]] = {
+  def getContents(login: String, repoName: String, path: String): Future[Either[String, ContentViewModel]] = {
     gitHubConnector.getContents[ContentModel](login, repoName, path).map {
       case Right(ls: List[ContentModel]) =>
         ls match {
           case _ if ls.head.`type` == "file" && ls.length == 1 =>
-            Right(views.html.displayfile(ls.head, repoName, path))
-          case _ => Right(views.html.displaycontents(ls, repoName, login, path))
+            Right(ContentViewModel(Some(ls.head), None, repoName, path, login))
+          case _ => Right(ContentViewModel(None, Some(ls), repoName, path, login))
         }
       case Left(err) => Left(err)
     }
   }
 
-  def getRepos(login: String): Future[Either[String, Html]] = {
+  def getRepos(login: String): Future[Either[String, RepoListViewModel]] = {
     gitHubConnector.getRepos[RepoModel](login).map {
-      case Right(ls: List[RepoModel]) => Right(views.html.displayrepos(ls))
+      case Right(ls: List[RepoModel]) => Right(RepoListViewModel(ls))
       case Left(err) => Left(err)
     }
   }
@@ -43,23 +43,36 @@ class RepositoryService @Inject()(
   }
 
   def create(request: Request[JsValue]): Future[Either[String, UserModel]] = {
-    request.body.validate[UserModel] match {
-      case JsSuccess(user, _) =>
-        userRepoTrait.create(user).map {
-          case None => Left("ERROR: Duplicate found, item not created.")
-          case _ => Right(user)
+    request.body
+      .validate[UserModel]
+      .fold(
+        errors => {
+          Future(Left("ERROR: User not created."))
+        },
+        userData => {
+          userRepoTrait.create(userData).map {
+            case None =>
+              Left("ERROR: User not created.")
+            case _ =>
+              Right(userData)
+          }
         }
-      case JsError(_) => Future(Left("ERROR: User not created."))
-    }
+      )
   }
 
   def update(id: String, request: Request[JsValue]): Future[Either[String, UserModel]] = {
-    request.body.validate[UserModel] match {
-      case JsSuccess(user: UserModel, _) =>
-        userRepoTrait.update(id, user)
-        Future(Right(user))
-      case JsError(_) => Future(Left("ERROR: User not updated."))
-    }
+    request.body
+      .validate[UserModel]
+      .fold(
+        errors => {
+          Future(Left("ERROR: User not updated."))
+        },
+        userData => {
+          userRepoTrait.update(id, userData).map { _ =>
+            Right(userData)
+          }
+        }
+      )
   }
 
   def read(id: String): Future[Either[String, UserModel]] = {

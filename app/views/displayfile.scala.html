@@ -1,14 +1,14 @@
-@import models._
-@import java.util.Base64
-@import java.nio.charset.StandardCharsets
-@(file: ContentModel, repoName: String, path: String)
+@import viewmodels.ContentViewModel
+@(contentViewModel: ContentViewModel)
 
-@main(s"Contents of ${file.name}"){
-    <h1>Contents of @file.name</h1>
-    <b>
-        @{
-            val textDecoded = new String(java.util.Base64.getMimeDecoder.decode(file.content.getOrElse("")))
-            textDecoded
-        }
-    </b>
+@main(s"Contents of ${contentViewModel.file.get.name}"){
+  <div id="file-content">
+    <h1>Contents of @contentViewModel.file.get.name</h1>
+    <p><code>
+    @{
+        val textDecoded = new String(java.util.Base64.getMimeDecoder.decode(contentViewModel.file.get.content.getOrElse("")))
+        textDecoded
+    }
+    </code></p>
+  </div>
 }

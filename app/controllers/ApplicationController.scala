@@ -71,23 +71,26 @@ class ApplicationController @Inject()(
   def partialUpdate[T](login: String, field: String, value: T): Action[JsValue] =
     Action.async(parse.json) { implicit request =>
       repositoryService.partialUpdate(login, field, value).map {
-        case Right(user) => (Accepted(Json.toJson(user)))
-        case Left(error) => (BadRequest(Json.toJson(error)))
+        case Right(user) => Accepted(Json.toJson(user))
+        case Left(error) => BadRequest(Json.toJson(error))
       }
     }
 
   def showRepositories(login: String): Action[AnyContent] = Action.async {
     repositoryService.getRepos(login).map {
-      case Right(webpage) => Ok(webpage)
+      case Right(viewmodel) => Ok(views.html.displayrepos(viewmodel))
       case Left(err: String) => BadRequest(Json.toJson(err))
     }
   }
 
   def showContents(login: String, repoName: String, path: String): Action[AnyContent] = Action.async {
     repositoryService.getContents(login, repoName, path).map {
-      case Right(webpage) => Ok(webpage)
+      case Right(viewmodel) =>
+        viewmodel.file match {
+          case Some(item) => Ok(views.html.displayfile(viewmodel))
+          case _ => Ok(views.html.displaycontents(viewmodel))
+        }
       case Left(err: String) => BadRequest(Json.toJson(err))
     }
   }
-
 }

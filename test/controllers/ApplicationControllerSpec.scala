@@ -2,13 +2,13 @@ package controllers
 
 import baseSpec.BaseSpecWithApplication
 import models.UserModel
+import org.jsoup._
 import org.scalatest.BeforeAndAfterEach
 import play.api.http.Status
-import play.api.http.Status.OK
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.Result
 import play.api.test.FakeRequest
-import play.api.test.Helpers.{await, contentAsJson, defaultAwaitTimeout, status}
+import play.api.test.Helpers.{await, contentAsJson, contentAsString, defaultAwaitTimeout, status}
 
 import scala.concurrent.Future
 
@@ -56,8 +56,20 @@ class ApplicationControllerSpec extends BaseSpecWithApplication with BeforeAndAf
     "with a good request, return an OK status page and return the view page" in {
       beforeEach()
       val fetchedResult: Future[Result] = (TestApplicationController.displayUser("Vedant-N421")(FakeRequest()))
+      val document = Jsoup.parse(contentAsString(fetchedResult))
       assert(status(fetchedResult) == Status.OK)
-//      assert(contentAsJson(fetchedResult).as[JsValue] == Json.toJson(me))
+      assert(document.getElementById("user_page").hasText)
+    }
+  }
+
+  "ApplicationController .displayUser bad request" should {
+    "return a bad request status page and return the view page" in {
+      beforeEach()
+      val fetchedResult: Future[Result] = TestApplicationController.displayUser("sdghifjsdiuf")(FakeRequest())
+      fetchedResult.map {
+        case page => assert(status(fetchedResult) == Status.BAD_REQUEST)
+        case _ => succeed
+      }
     }
   }
 
@@ -323,6 +335,38 @@ class ApplicationControllerSpec extends BaseSpecWithApplication with BeforeAndAf
       val deleteResult: Result =
         await(TestApplicationController.delete(baddy)(FakeRequest()))
       assert(deleteResult.header.status == Status.BAD_REQUEST)
+    }
+  }
+
+  "ApplicationController .showRepositories" should {
+    "with a good request, return a viewmodel" in {
+      beforeEach()
+      val fetchedResult: Future[Result] = (TestApplicationController.showRepositories("Vedant-N421")(FakeRequest()))
+      val document = Jsoup.parse(contentAsString(fetchedResult))
+      assert(status(fetchedResult) == Status.OK)
+      assert(document.getElementById("display-repolist").hasText)
+    }
+  }
+
+  "ApplicationController .showContents" should {
+    "with a good request, return a viewmodel" in {
+      beforeEach()
+      val fetchedResult: Future[Result] =
+        TestApplicationController.showContents("Vedant-N421", "play-template", ".idea/misc.xml")(FakeRequest())
+      val document = Jsoup.parse(contentAsString(fetchedResult))
+      assert(status(fetchedResult) == Status.OK)
+      assert(document.getElementById("file-content").hasText)
+    }
+  }
+
+  "ApplicationController .showContents for a list of files" should {
+    "with a good request, return a viewmodel" in {
+      beforeEach()
+      val fetchedResult: Future[Result] =
+        TestApplicationController.showContents("Vedant-N421", "play-template", ".idea")(FakeRequest())
+      val document = Jsoup.parse(contentAsString(fetchedResult))
+      assert(status(fetchedResult) == Status.OK)
+      assert(document.getElementById("repository-contents").hasText)
     }
   }
 

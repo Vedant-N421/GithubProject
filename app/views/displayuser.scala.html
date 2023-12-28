@@ -2,6 +2,7 @@
 @(userModel: UserModel)
 
 @main("Display User"){
+  <div id="user_page">
     <h1>GitHub Details for <a target="_blank" href="@userModel.url">@userModel.login</a></h1>
   <b>
       Date account created: @userModel.created_at <br><br>
@@ -9,4 +10,5 @@
       Following: @userModel.following <br><br>
   </b>
     <a href="@routes.ApplicationController.showRepositories(userModel.login)">View public repositories</a>
+  </div>
 }
