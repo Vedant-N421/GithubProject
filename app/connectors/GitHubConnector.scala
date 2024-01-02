@@ -1,13 +1,14 @@
 package connectors
 
 import models.{ContentModel, RepoModel, UserModel}
+import play.api.Configuration
 import play.api.libs.json.{JsError, JsSuccess, OFormat}
 import play.api.libs.ws.{WSClient, WSResponse}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class GitHubConnector @Inject()(ws: WSClient) {
+class GitHubConnector @Inject()(ws: WSClient, config: Configuration) {
   def get[Response](
       login: String = "404",
       url: String = "https://api.github.com/users/"
@@ -66,21 +67,28 @@ class GitHubConnector @Inject()(ws: WSClient) {
   }
 
   def gitCreate[Response](
+      login: String,
+      repoName: String,
       message: String,
       fileName: String,
       content: String,
       path: String
   )(implicit rds: OFormat[Response], ec: ExecutionContext): Future[Either[String, String]] = {
 //    Need to remove the below from being hard-coded lol
-    val gitHubAuthToken = "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"
+    val gitHubAuthToken = config.get[String]("AUTHPASS")
+
+    val url = path match {
+      case "" => s"https://api.github.com/repos/$login/$repoName/contents/$fileName"
+      case path => s"https://api.github.com/repos/$login/$repoName/contents/$path/$fileName"
+    }
 
     val request = ws
-      .url(path + fileName)
+      .url(url)
       .addHttpHeaders("Accept" -> "application/vnd.github+json", "Authorization" -> s"Bearer ${gitHubAuthToken}")
       .addHttpHeaders("Content-Type" -> "application/json")
 
     val jsonPayload =
-      s"""{"message": ${message}, "committer": {"name": "Vedant Nemane", "email": "vedant.nemane@mercator.group"}, "content": "${content}"}"""
+      raw"""{"message": "${s"$message"}", "committer": {"name": "Vedant Nemane", "email": "vedant.nemane@mercator.group"}, "content": "${s"$content"}"}"""
 
     val wsResponseFuture = request.put(jsonPayload)
 

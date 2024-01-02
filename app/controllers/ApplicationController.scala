@@ -1,10 +1,11 @@
 package controllers
 
-import models.GitFile.dataForm
 import connectors.GitHubConnector
+import models.GitFile.dataForm
 import models._
 import play.api.libs.json.{JsValue, Json}
-import play.api.mvc.{Action, AnyContent, BaseController, ControllerComponents}
+import play.api.mvc._
+import play.filters.csrf.CSRF
 import services.RepositoryService
 
 import java.nio.charset.StandardCharsets
@@ -20,8 +21,17 @@ class ApplicationController @Inject()(
     extends BaseController
     with play.api.i18n.I18nSupport {
 
-  def gitCreateForm(): Action[AnyContent] =
+  private def accessToken(implicit request: Request[_]): Option[CSRF.Token] = {
+    CSRF.getToken
+  }
+
+  def gitCreate(login: String, repoName: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.creategitfile(GitFile.dataForm, login, repoName))
+  }
+
+  def gitCreateForm(login: String, repoName: String): Action[AnyContent] = {
     Action.async { implicit request =>
+      accessToken
       dataForm
         .bindFromRequest()
         .fold(
@@ -32,28 +42,18 @@ class ApplicationController @Inject()(
           formData => {
             // here write how you would use this data to create a new file
             gitHubConnector
-              .gitCreate[GitFile](formData.message,
-                                  formData.fileName,
-                                  Base64.getEncoder.encodeToString(formData.content.getBytes(StandardCharsets.UTF_8)),
-                                  formData.path)
-              .map {
-                case Right(file: String) => Created(Json.toJson(file))
-                case Left(err: String) => BadRequest(Json.toJson(err))
-              }
+              .gitCreate[GitFile](
+                login,
+                repoName,
+                formData.message,
+                formData.fileName,
+                Base64.getEncoder.encodeToString(formData.content.getBytes(StandardCharsets.UTF_8)),
+                formData.path
+              )
           }
         )
-//      gitHubConnector
-//        .gitCreate[GitFile](
-//          "Created with Scala and Play",
-//          ".gitignore",
-//          "VGVzdGluZyB0aGUgY3JlYXRlIGZ1bmN0aW9uIHdpdGggY3VybCBjb21tYW5kLg==",
-//          "https://api.github.com/repos/Vedant-N421/ScalaUdemyTraining/contents/.gitignore"
-//        )
-//        .map {
-//          case Right(stuff) => Ok(stuff)
-//          case Left(moreStuff) => BadRequest(moreStuff)
-//        }
     }
+  }
 
   def displayUser(login: String): Action[AnyContent] = Action.async { implicit request =>
     gitHubConnector.get[UserModel](login).map {
