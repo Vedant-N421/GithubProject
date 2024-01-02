@@ -64,4 +64,33 @@ class GitHubConnector @Inject()(ws: WSClient) {
           Left("Could not connect to Github API.")
       }
   }
+
+  def gitCreate[Response](
+      message: String,
+      fileName: String,
+      content: String,
+      path: String
+  )(implicit rds: OFormat[Response], ec: ExecutionContext): Future[Either[String, String]] = {
+//    Need to remove the below from being hard-coded lol
+    val gitHubAuthToken = "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"
+
+    val request = ws
+      .url(path + fileName)
+      .addHttpHeaders("Accept" -> "application/vnd.github+json", "Authorization" -> s"Bearer ${gitHubAuthToken}")
+      .addHttpHeaders("Content-Type" -> "application/json")
+
+    val jsonPayload =
+      s"""{"message": ${message}, "committer": {"name": "Vedant Nemane", "email": "vedant.nemane@mercator.group"}, "content": "${content}"}"""
+
+    val wsResponseFuture = request.put(jsonPayload)
+
+    wsResponseFuture
+      .map { x: WSResponse =>
+        Right(x.body)
+      }
+      .recover {
+        case _: WSResponse =>
+          Left("Could not connect to GitHub API.")
+      }
+  }
 }

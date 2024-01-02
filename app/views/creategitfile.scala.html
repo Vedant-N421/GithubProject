@@ -1,0 +1,16 @@
+@import models.GitFile
+
+@(dataForm: Form[GitFile])(implicit request: RequestHeader, messages: Messages)
+
+@main("Create file"){
+    <div>
+    @helper.form(action = routes.ApplicationController.gitCreateForm()) {
+        @helper.CSRF.formField
+        @helper.inputText(dataForm("Commit message"))
+        @helper.inputText(dataForm("File name"))
+        @helper.inputText(dataForm("Content"))
+        @helper.inputText(dataForm("Path"))
+        <input class="submitButton" type="submit" value="Submit">
+        }
+    </div>
+}
