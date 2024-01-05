@@ -6,7 +6,7 @@ import play.api.libs.json.{Json, OFormat}
 case class GitFile(
     message: String,
     fileName: String,
-    content: String,
+    content: Option[String],
     path: String
 )
 
@@ -17,7 +17,7 @@ object GitFile {
     mapping(
       "message" -> text,
       "fileName" -> text,
-      "content" -> text,
+      "content" -> optional(text),
       "path" -> text
     )(GitFile.apply)(GitFile.unapply)
   )

@@ -23,3 +23,9 @@ GET     /github/users/:login/repos/:repoName/*path      controllers.ApplicationC
 
 GET      /github/users/:login/:repoName/createfile           controllers.ApplicationController.gitCreate(login: String, repoName: String)
 POST     /github/users/:login/:repoName/createfile           controllers.ApplicationController.gitCreateForm(login: String, repoName: String)
+
+GET      /github/users/:login/:repoName/updatefile           controllers.ApplicationController.gitUpdate(login: String, repoName: String)
+POST     /github/users/:login/:repoName/updatefile           controllers.ApplicationController.gitUpdateForm(login: String, repoName: String)
+
+GET      /github/users/:login/:repoName/deletefile           controllers.ApplicationController.gitDelete(login: String, repoName: String)
+POST     /github/users/:login/:repoName/deletefile           controllers.ApplicationController.gitDeleteForm(login: String, repoName: String)

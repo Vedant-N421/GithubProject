@@ -17,7 +17,7 @@ class RepositoryService @Inject()(
 )(implicit executionContext: ExecutionContext) {
 
   def getContents(login: String, repoName: String, path: String): Future[Either[String, ContentViewModel]] = {
-    gitHubConnector.getContents[ContentModel](login, repoName, path).map {
+    gitHubConnector.getContents(login, repoName, path).map {
       case Right(ls: List[ContentModel]) =>
         ls match {
           case _ if ls.head.`type` == "file" && ls.length == 1 =>
@@ -28,8 +28,10 @@ class RepositoryService @Inject()(
     }
   }
 
-  def getRepos(login: String): Future[Either[String, RepoListViewModel]] = {
-    gitHubConnector.getRepos[RepoModel](login).map {
+  def getRepos(
+      login: String
+  ): Future[Either[String, RepoListViewModel]] = {
+    gitHubConnector.getRepos(login).map {
       case Right(ls: List[RepoModel]) => Right(RepoListViewModel(ls))
       case Left(err) => Left(err)
     }
@@ -111,5 +113,4 @@ class RepositoryService @Inject()(
       case _ => Left("ERROR: User not updated.")
     }
   }
-
 }

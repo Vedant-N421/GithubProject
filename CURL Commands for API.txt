@@ -27,3 +27,11 @@ https://api.github.com/repos/Vedant-N421/ScalaUdemyTraining/contents/README.md \
 -d '{"message":"curl update","committer":{"name":"Vedant Nemane","email":"vedant.nemane@mercator.group"},"content":"VGVzdGluZyB0aGUgdXBkYXRlIGZ1bmN0aW9uIHdpdGggY3VybCBjb21tYW5kLg==", "sha":"ff8627fa4e16f843afc3f25e5c22ef797fa1dc68"}'
 
 
+Create:
+Message, committer:{name, email}, content
+
+Update: 
+Message, committer:{name, email}, content, sha
+
+Delete:
+Message, committer:{name, email}, sha
