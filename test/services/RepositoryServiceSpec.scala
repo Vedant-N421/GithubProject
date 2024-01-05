@@ -318,7 +318,7 @@ class RepositoryServiceSpec extends BaseSpec with MockFactory with ScalaFutures 
     "return the view model for a list of repositories" in {
       val another = mock[RepoModel]
       (gitHubConnector
-        .getRepos[RepoModel](_: String, _: String)(_: OFormat[RepoModel], _: ExecutionContext))
+        .getRepos(_: String, _: String)(_: OFormat[RepoModel], _: ExecutionContext))
         .expects(*, *, *, *)
         .returning(Future(Right(List(another))))
         .once()
@@ -334,7 +334,7 @@ class RepositoryServiceSpec extends BaseSpec with MockFactory with ScalaFutures 
     "return the view model for a list of repositories" in {
       val another = mock[RepoModel]
       (gitHubConnector
-        .getRepos[RepoModel](_: String, _: String)(_: OFormat[RepoModel], _: ExecutionContext))
+        .getRepos(_: String, _: String)(_: OFormat[RepoModel], _: ExecutionContext))
         .expects(*, *, *, *)
         .returning(Future(Left("Could not connect to Github API.")))
         .once()

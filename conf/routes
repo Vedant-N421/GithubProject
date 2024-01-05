@@ -20,3 +20,12 @@ DELETE  /delete/:login              controllers.ApplicationController.delete(log
 GET     /github/users/:login/repositories               controllers.ApplicationController.showRepositories(login: String)
 GET     /github/users/:login/repos/:repoName            controllers.ApplicationController.showContents(login: String, repoName: String, path: String = "")
 GET     /github/users/:login/repos/:repoName/*path      controllers.ApplicationController.showContents(login: String, repoName: String, path: String)
+
+GET      /github/users/:login/:repoName/createfile           controllers.ApplicationController.gitCreate(login: String, repoName: String)
+POST     /github/users/:login/:repoName/createfile           controllers.ApplicationController.gitCreateForm(login: String, repoName: String)
+
+GET      /github/users/:login/:repoName/updatefile           controllers.ApplicationController.gitUpdate(login: String, repoName: String)
+POST     /github/users/:login/:repoName/updatefile           controllers.ApplicationController.gitUpdateForm(login: String, repoName: String)
+
+GET      /github/users/:login/:repoName/deletefile           controllers.ApplicationController.gitDelete(login: String, repoName: String)
+POST     /github/users/:login/:repoName/deletefile           controllers.ApplicationController.gitDeleteForm(login: String, repoName: String)

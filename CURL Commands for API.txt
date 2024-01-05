@@ -1,0 +1,37 @@
+VIEW CONTENTS CURL COMMAND:
+
+curl -L \
+-H "Accept: application/vnd.github+json" \
+-H "Authorization: Bearer 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" \
+-H "X-GitHub-Api-Version: 2022-11-28" \
+https://api.github.com/repos/Vedant-N421/ScalaUdemyTraining/contents/
+
+
+CREATE CURL COMMAND:
+curl -L \
+-X PUT \
+-H "Accept: application/vnd.github+json" \
+-H "Authorization: Bearer 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" \
+-H "X-GitHub-Api-Version: 2022-11-28" \
+https://api.github.com/repos/Vedant-N421/ScalaUdemyTraining/contents/.gitignore \
+-d '{"message":"testing","committer":{"name":"Vedant Nemane","email":"vedant.nemane@mercator.group"},"content":"VGVzdGluZyB0aGUgY3JlYXRlIGZ1bmN0aW9uIHdpdGggY3VybCBjb21tYW5kLg=="}'
+
+
+UPDATE CURL COMMAND:
+curl -L \
+-X PUT \
+-H "Accept: application/vnd.github+json" \
+-H "Authorization: Bearer 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" \
+-H "X-GitHub-Api-Version: 2022-11-28" \
+https://api.github.com/repos/Vedant-N421/ScalaUdemyTraining/contents/README.md \
+-d '{"message":"curl update","committer":{"name":"Vedant Nemane","email":"vedant.nemane@mercator.group"},"content":"VGVzdGluZyB0aGUgdXBkYXRlIGZ1bmN0aW9uIHdpdGggY3VybCBjb21tYW5kLg==", "sha":"ff8627fa4e16f843afc3f25e5c22ef797fa1dc68"}'
+
+
+Create:
+Message, committer:{name, email}, content
+
+Update: 
+Message, committer:{name, email}, content, sha
+
+Delete:
+Message, committer:{name, email}, sha
