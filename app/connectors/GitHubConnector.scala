@@ -3,7 +3,7 @@ package connectors
 import models._
 import play.api.Configuration
 import play.api.libs.json._
-import play.api.libs.ws.{WSClient, WSResponse}
+import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -11,13 +11,17 @@ import scala.concurrent.{ExecutionContext, Future}
 class GitHubConnector @Inject()(ws: WSClient, config: Configuration) {
 
   def get[Response](url: String)(implicit rds: OFormat[Response],
-                                 ec: ExecutionContext): Future[Either[String, Response]] = {
+                                 ec: ExecutionContext): Future[Either[String, List[Response]]] = {
     ws.url(url)
       .get()
       .map { result =>
         result.json.validate[Response] match {
-          case JsSuccess(value, _) => Right(value)
-          case e: JsError => Left(e.toString)
+          case JsSuccess(x, _) => Right(List(x))
+          case e: JsError =>
+            result.json.validate[List[Response]] match {
+              case JsSuccess(y, _) => Right(y)
+              case e: JsError => Left("ERROR: Could not parse JSON.")
+            }
         }
       }
       .recover {
@@ -26,40 +30,25 @@ class GitHubConnector @Inject()(ws: WSClient, config: Configuration) {
       }
   }
 
-  def getAsList[Response](url: String)(implicit rds: OFormat[Response],
-                                       ec: ExecutionContext): Future[Either[String, List[Response]]] = {
-    ws.url(url)
-      .get()
-      .map { result =>
-        result.json.validate[List[Response]] match {
-          case JsSuccess(value, _) => Right(value)
-          case e: JsError => Left(e.toString)
-        }
-      }
-      .recover {
-        case _: WSResponse =>
-          Left("ERROR: Could not connect to Github API.")
-      }
+  def getUser(login: String)(implicit rds: OFormat[UserModel],
+                             ec: ExecutionContext): Future[Either[String, UserModel]] = {
+    get[UserModel](s"https://api.github.com/users/$login").map {
+      case Left(x: String) =>
+        Left("Some error")
+      case Right(y: List[UserModel]) =>
+        Right(y.head)
+    }
   }
 
   def getRepos(login: String)(implicit rds: OFormat[RepoModel],
-                              ec: ExecutionContext): Future[Either[String, List[RepoModel]]] = {
-    getAsList[RepoModel](s"https://api.github.com/users/$login/repos")
-  }
+                              ec: ExecutionContext): Future[Either[String, List[RepoModel]]] =
+    get[RepoModel](s"https://api.github.com/users/$login/repos")
 
   def getContents(login: String, repoName: String, path: String)(
       implicit rds: OFormat[ContentModel],
       ec: ExecutionContext
-  ): Future[Either[String, List[ContentModel]]] = {
-    getAsList[ContentModel](s"https://api.github.com/repos/$login/$repoName/contents$path").flatMap {
-      case Right(x: List[ContentModel]) => Future(Right(x))
-      case Left(_) =>
-        get[ContentModel](s"https://api.github.com/repos/$login/$repoName/contents$path").map {
-          case Right(y: ContentModel) => Right(List(y))
-          case Left(err) => Left(err)
-        }
-    }
-  }
+  ): Future[Either[String, List[ContentModel]]] =
+    get[ContentModel](s"https://api.github.com/repos/$login/$repoName/contents$path")
 
   def gitCUD(
       cudParam: gitCUDParameters
@@ -79,10 +68,16 @@ class GitHubConnector @Inject()(ws: WSClient, config: Configuration) {
       case "DELETE" => delete(file)
     }
 
+    sendJson(addedPayload, request, cudParam)
+  }
+
+  private def sendJson(addedPayload: Future[String],
+                       request: WSRequest,
+                       cudParam: gitCUDParameters)(implicit rds: OFormat[ContentModel], ec: ExecutionContext) = {
     addedPayload
       .map(
-        added =>
-          raw"""{"message": "${s"${cudParam.message}"}", "committer": {"name": "Vedant Nemane", "email": "vedant.nemane@mercator.group"}""" + added
+        added => raw"""{"message": "${s"${cudParam.message}"}", "committer": {"name": "Vedant Nemane",
+               |"email": "vedant.nemane@mercator.group"}""".stripMargin + added
       )
       .flatMap { jsonPayload =>
         val wsResponseFuture = cudParam.CUD match {
@@ -131,7 +126,7 @@ class GitHubConnector @Inject()(ws: WSClient, config: Configuration) {
   private def findFile(login: String, repoName: String, path: String, fileName: String)(
       implicit ec: ExecutionContext,
       rds: OFormat[ContentModel]
-  ) = {
+  ): Future[List[ContentModel]] = {
     getContents(login, repoName, path).map {
       case Right(res) =>
         res.filter { x =>
@@ -141,7 +136,8 @@ class GitHubConnector @Inject()(ws: WSClient, config: Configuration) {
     }
   }
 
-  private def getUrl(login: String, repoName: String, fileName: String, path: String) = {
+  private def getUrl(login: String, repoName: String, fileName: String, path: String): String = {
+    // This allows for spaces to bypass the path field- is there a way to make this safer?
     path match {
       case "" => s"https://api.github.com/repos/$login/$repoName/contents/$fileName"
       case path => s"https://api.github.com/repos/$login/$repoName/contents/$path/$fileName"

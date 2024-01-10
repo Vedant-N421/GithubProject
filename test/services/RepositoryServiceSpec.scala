@@ -269,7 +269,7 @@ class RepositoryServiceSpec extends BaseSpec with MockFactory with ScalaFutures 
     "should return the view model with a good request" in {
       val another = mock[ContentModel]
       (gitHubConnector
-        .getContents[ContentModel](_: String, _: String, _: String)(_: OFormat[ContentModel], _: ExecutionContext))
+        .getContents(_: String, _: String, _: String)(_: OFormat[ContentModel], _: ExecutionContext))
         .expects(*, *, *, *, *)
         .returning(Future.successful(Right(List(another))))
         .once()
@@ -287,7 +287,7 @@ class RepositoryServiceSpec extends BaseSpec with MockFactory with ScalaFutures 
       val onemore = mock[ContentModel]
       val listFiles = List(another, onemore)
       (gitHubConnector
-        .getContents[ContentModel](_: String, _: String, _: String)(_: OFormat[ContentModel], _: ExecutionContext))
+        .getContents(_: String, _: String, _: String)(_: OFormat[ContentModel], _: ExecutionContext))
         .expects(*, *, *, *, *)
         .returning(Future.successful(Right(listFiles)))
         .once()
@@ -302,7 +302,7 @@ class RepositoryServiceSpec extends BaseSpec with MockFactory with ScalaFutures 
   "getContents given a bad request" should {
     "return an error" in {
       (gitHubConnector
-        .getContents[ContentModel](_: String, _: String, _: String)(_: OFormat[ContentModel], _: ExecutionContext))
+        .getContents(_: String, _: String, _: String)(_: OFormat[ContentModel], _: ExecutionContext))
         .expects(*, *, *, *, *)
         .returning(Future(Left("Could not connect to Github API.")))
         .once()
@@ -318,8 +318,8 @@ class RepositoryServiceSpec extends BaseSpec with MockFactory with ScalaFutures 
     "return the view model for a list of repositories" in {
       val another = mock[RepoModel]
       (gitHubConnector
-        .getRepos(_: String, _: String)(_: OFormat[RepoModel], _: ExecutionContext))
-        .expects(*, *, *, *)
+        .getRepos(_: String)(_: OFormat[RepoModel], _: ExecutionContext))
+        .expects(*, *, *)
         .returning(Future(Right(List(another))))
         .once()
 
@@ -334,8 +334,8 @@ class RepositoryServiceSpec extends BaseSpec with MockFactory with ScalaFutures 
     "return the view model for a list of repositories" in {
       val another = mock[RepoModel]
       (gitHubConnector
-        .getRepos(_: String, _: String)(_: OFormat[RepoModel], _: ExecutionContext))
-        .expects(*, *, *, *)
+        .getRepos(_: String)(_: OFormat[RepoModel], _: ExecutionContext))
+        .expects(*, *, *)
         .returning(Future(Left("Could not connect to Github API.")))
         .once()
 

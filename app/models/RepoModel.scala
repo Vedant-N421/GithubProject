@@ -13,14 +13,6 @@ object RepoModel {
   implicit val formats: OFormat[RepoModel] = Json.format[RepoModel]
 }
 
-//case class RepoModelList(
-//    ls: List[RepoModel]
-//)
-//
-//object RepoModelList {
-//  implicit val formats: OFormat[RepoModelList] = Json.format[RepoModelList]
-//}
-
 case class Owner(
     login: String,
     url: String

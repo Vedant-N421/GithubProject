@@ -147,7 +147,7 @@ class ApplicationController @Inject()(
   }
 
   def displayUser(login: String): Action[AnyContent] = Action.async { implicit request =>
-    gitHubConnector.get[UserModel](login).map {
+    gitHubConnector.getUser(login).map {
       case Right(user: UserModel) => Ok(views.html.displayuser(user))
       case Left(err: String) => BadRequest(err)
     }
