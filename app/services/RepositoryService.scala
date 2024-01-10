@@ -32,7 +32,8 @@ class RepositoryService @Inject()(
       login: String
   ): Future[Either[String, RepoListViewModel]] = {
     gitHubConnector.getRepos(login).map {
-      case Right(ls: List[RepoModel]) => Right(RepoListViewModel(ls))
+      case Right(ls: List[RepoModel]) =>
+        Right(RepoListViewModel(ls))
       case Left(err) => Left(err)
     }
   }
